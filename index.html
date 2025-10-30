@@ -1076,8 +1076,49 @@
                     
                     const data = await response.json();
                     
+                    // Convert markdown to HTML
+                    function formatOutput(text) {
+                        // Convert **bold** to <strong>
+                        text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                        
+                        // Convert bullet points (- or * at start of line) to proper lists
+                        const lines = text.split('\n');
+                        let inList = false;
+                        let formatted = [];
+                        
+                        for (let i = 0; i < lines.length; i++) {
+                            const line = lines[i];
+                            
+                            // Check if line is a bullet point
+                            if (line.trim().match(/^[-*]\s/)) {
+                                if (!inList) {
+                                    formatted.push('<ul class="list-disc ml-6 my-2">');
+                                    inList = true;
+                                }
+                                const content = line.trim().substring(2); // Remove "- " or "* "
+                                formatted.push(`<li>${content}</li>`);
+                            } else {
+                                if (inList) {
+                                    formatted.push('</ul>');
+                                    inList = false;
+                                }
+                                if (line.trim()) {
+                                    formatted.push(line);
+                                } else {
+                                    formatted.push('<br>');
+                                }
+                            }
+                        }
+                        
+                        if (inList) {
+                            formatted.push('</ul>');
+                        }
+                        
+                        return formatted.join('\n');
+                    }
+                    
                     // Display result
-                    outputContent.innerHTML = data.result.replace(/\n/g, '<br>');
+                    outputContent.innerHTML = formatOutput(data.result);
                     demoOutput.classList.remove('hidden');
                     demoOutput.classList.add('fade-in');
                     
