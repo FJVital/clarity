@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your messy thoughts → clear messages, instantly. AI-powered writing assistant that transforms bullet points into professional communication.">
+    <meta name="keywords" content="AI writing assistant, message clarity, email writing, professional communication, AI rewriter">
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://writeclarity.com/">
+    <meta property="og:title" content="Clarity - Your Thoughts, Clearly Said">
+    <meta property="og:description" content="Write like you think. AI makes it professional. Never struggle with words again.">
+    <meta property="og:image" content="https://writeclarity.com/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://writeclarity.com/">
+    <meta property="twitter:title" content="Clarity - Your Thoughts, Clearly Said">
+    <meta property="twitter:description" content="Write like you think. AI makes it professional.">
+    <meta property="twitter:image" content="https://writeclarity.com/og-image.png">
+    
+    <title>Clarity - Your Thoughts, Clearly Said</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>✨</text></svg>">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        accent: '#F97316',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #6366F1 0%, #F97316 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-bounce-arrow {
+            animation: bounceArrow 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounceArrow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(10px); }
+        }
+        
+        .transform-text {
+            transition: all 0.3s ease;
+        }
+        
+        .demo-input {
+            transition: all 0.3s ease;
+        }
+        
+        .demo-input:focus {
+            transform: scale(1.01);
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hover-lift {
+            transition: transform 0.2s ease;
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-4px);
+        }
+        
+        .comparison-table td {
+            padding: 1rem;
+        }
+        
+        .icon-container {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+        
+        .icon-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .hero-example {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .input-box, .output-box {
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            background: white;
+        }
+        
+        .input-box {
+            border-style: dashed;
+        }
+        
+        .output-box {
+            border: 2px solid #10B981;
+            background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-primary">Clarity</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#how-it-works" class="text-gray-600 hover:text-primary transition">How It Works</a>
+                    <a href="#pricing" class="text-gray-600 hover:text-primary transition">Pricing</a>
+                    <a href="#faq" class="text-gray-600 hover:text-primary transition">FAQ</a>
+                    <a href="#pricing" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition font-medium">
+                        Start Free
+                    </a>
+                </div>
+                <div class="md:hidden">
+                    <button onclick="alert('Mobile menu - connect to your navigation')" class="text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-orange-50 pt-20 pb-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="fade-in">
+                    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
+                        Your Messy Thoughts → 
+                        <span class="text-gradient">Clear Messages</span>, Instantly
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                        Write like you think. AI makes it professional. Never struggle with words again.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+                        <a href="#pricing" class="bg-primary text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-center">
+                            Start Writing Free
+                        </a>
+                        <a href="#demo" class="bg-white text-primary px-8 py-4 rounded-lg border-2 border-primary hover:bg-indigo-50 transition font-semibold text-lg text-center">
+                            See How It Works ↓
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-6 text-sm text-gray-600">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            No credit card required
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            10 free rewrites daily
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Hero Visual - Brad Example -->
+                <div class="relative animate-float">
+                    <div class="hero-example p-8">
+                        <img src="input_output.png" alt="Message transformation example" class="w-full h-auto rounded-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-20 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div class="absolute bottom-20 left-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 1s;"></div>
+    </section>
+
+    <!-- Problem Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    You Know What You Want to Say.<br>
+                    The Words Just Won't Come Out Right.
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    You're not bad at communication. You just need a translator between your brain and "professional."
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Pain Point 1 -->
+                <div class="bg-gray-50 rounded-xl p-8 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="email-paralysis.png" alt="Email Paralysis">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Email Paralysis</h3>
+                    <p class="text-gray-600 leading-relaxed text-center">
+                        You stare at a blank email for 10 minutes. You know what you mean, but it sounds wrong. So you write, delete, rewrite, delete again...
+                    </p>
+                </div>
+                
+                <!-- Pain Point 2 -->
+                <div class="bg-gray-50 rounded-xl p-8 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="angry-drafts.png" alt="Angry Drafts">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Angry Drafts</h3>
+                    <p class="text-gray-600 leading-relaxed text-center">
+                        You're upset. You type out your real feelings. But you know you can't send THAT. Now you need to translate rage into diplomacy.
+                    </p>
+                </div>
+                
+                <!-- Pain Point 3 -->
+                <div class="bg-gray-50 rounded-xl p-8 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="overcomplicate-everything.png" alt="Overcomplicate Everything">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Overcomplicate Everything</h3>
+                    <p class="text-gray-600 leading-relaxed text-center">
+                        What should be a simple message turns into three paragraphs. Or worse—you make it so brief it sounds rude. Finding the middle ground is exhausting.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Write Like You Think. We Handle the Rest.
+                </h2>
+                <p class="text-xl text-gray-600">Three simple steps to better communication</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="icon-container mb-6">
+                        <img src="brain-dump.png" alt="Brain Dump">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">1. Brain Dump</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Type your messy, unfiltered thoughts. Bullet points. Stream of consciousness. Whatever's in your head.
+                    </p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="icon-container mb-6">
+                        <img src="choose-our-style.png" alt="Choose Your Style">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">2. Choose Your Style</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Pick the tone: Professional, Friendly, Direct, Persuasive, or "Cool Down This Anger."
+                    </p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="icon-container mb-6">
+                        <img src="copy-send.png" alt="Copy & Send">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">3. Copy & Send</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Get your polished message in 3 seconds. Copy it. Paste it anywhere. Done.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Clarity vs ChatGPT/Claude Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-12 border-2 border-primary">
+                <div class="flex items-start gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="icon-container">
+                            <img src="not-use-claude.png" alt="Why Clarity">
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900 mb-6">
+                            Why use Clarity instead of ChatGPT/Claude?
+                        </h2>
+                        <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                            Great question! Think of us as ChatGPT/Claude's younger sibling who specialized in one thing and became the best at it. We're 3x faster (no tab switching), purpose-built for messages, learn YOUR writing style, cost half the price if you only need message help, and integrate directly into Gmail, Slack, and LinkedIn. ChatGPT/Claude is like having a Swiss Army knife—we're the chef's knife, perfect for one job and used 10x more often.
+                        </p>
+                        <div class="grid md:grid-cols-2 gap-4 text-gray-700">
+                            <div class="flex items-center gap-3">
+                                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>3x faster (no tab switching)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Purpose-built (just for messages)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Contextual (learns YOUR style)</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Half the price</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Integrated (Gmail, Slack, LinkedIn)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo Section -->
+    <section id="demo" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">See It In Action</h2>
+                <p class="text-xl text-gray-600 mb-3">Try it yourself with a real example</p>
+                <p class="text-sm text-primary font-semibold">
+                    2 free transformations - no signup required
+                </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-2xl p-8 border-2 border-primary shadow-xl">
+                <div class="mb-6">
+                    <textarea 
+                        id="demo-input"
+                        class="demo-input w-full h-32 p-4 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none text-sm resize-none"
+                        placeholder="Write all you think... don't worry about order, grammar, pronouns, or spelling. Just brain dump."></textarea>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Choose style:</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <button class="style-btn bg-primary border-2 border-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-medium" data-style="professional">
+                            Professional
+                        </button>
+                        <button class="style-btn bg-white border-2 border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:border-primary hover:text-primary transition font-medium" data-style="friendly">
+                            Friendly
+                        </button>
+                        <button class="style-btn bg-white border-2 border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:border-primary hover:text-primary transition font-medium" data-style="direct">
+                            Direct
+                        </button>
+                        <button class="style-btn bg-white border-2 border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:border-primary hover:text-primary transition font-medium" data-style="persuasive">
+                            Persuasive
+                        </button>
+                    </div>
+                </div>
+                
+                <button id="transform-btn" class="w-full bg-primary text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition font-semibold text-lg shadow-lg mb-6">
+                    Transform Message (2 tries left)
+                </button>
+                
+                <div id="demo-output" class="hidden">
+                    <div class="bg-white rounded-lg p-6 border-2 border-primary text-gray-800 leading-relaxed mb-4 min-h-[150px]" id="output-content">
+                        <p class="text-gray-400 italic">Your composed message will appear here...</p>
+                    </div>
+                    <button id="copy-btn" class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-medium">
+                        Copy to Clipboard
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-center text-gray-600 mt-8">
+                <strong>This is a live demo.</strong> You get 2 free tries. Sign up to rewrite unlimited messages.
+            </p>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">One Tool. Infinite Situations.</h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Use Case 1 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="professional-emails.png" alt="Professional Emails">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Professional Emails</h3>
+                    <p class="text-gray-600 text-center">
+                        Bullet points → polished messages. Perfect for busy designers, founders, and anyone who thinks faster than they type.
+                    </p>
+                </div>
+                
+                <!-- Use Case 2 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="networking-messages.png" alt="Networking Messages">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Networking Messages</h3>
+                    <p class="text-gray-600 text-center">
+                        LinkedIn reach-outs that don't sound robotic. Actually make connections instead of getting ignored.
+                    </p>
+                </div>
+                
+                <!-- Use Case 3 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="conflict-resolution.png" alt="Conflict Resolution">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Conflict Resolution</h3>
+                    <p class="text-gray-600 text-center">
+                        Angry draft → diplomatic message. Say what you need to say without burning bridges.
+                    </p>
+                </div>
+                
+                <!-- Use Case 4 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="sales-outreach.png" alt="Sales Outreach">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Sales Outreach</h3>
+                    <p class="text-gray-600 text-center">
+                        Generic pitch → personalized message. Stand out in crowded inboxes.
+                    </p>
+                </div>
+                
+                <!-- Use Case 5 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="quick-responses.png" alt="Quick Responses">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Quick Responses</h3>
+                    <p class="text-gray-600 text-center">
+                        "Yes" → "Thanks for checking! Yes, that works perfectly." Add warmth without overthinking.
+                    </p>
+                </div>
+                
+                <!-- Use Case 6 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="non-native-speakers.png" alt="Non-Native Speakers">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Non-Native Speakers</h3>
+                    <p class="text-gray-600 text-center">
+                        Correct but stiff → natural and fluent. Sound like a native speaker without years of practice.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Not Just Use ChatGPT or Claude?</h2>
+                <p class="text-xl text-gray-600">Great question. Here's the honest comparison.</p>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full bg-white rounded-xl shadow-lg overflow-hidden comparison-table">
+                    <thead class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                        <tr>
+                            <th class="text-left p-4 font-semibold">Feature</th>
+                            <th class="text-center p-4 font-semibold">ChatGPT/Claude</th>
+                            <th class="text-center p-4 font-semibold">Grammarly</th>
+                            <th class="text-center p-4 font-semibold bg-primary">Clarity</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Speed</td>
+                            <td class="text-center text-gray-600">30+ seconds</td>
+                            <td class="text-center text-gray-600">Instant</td>
+                            <td class="text-center font-bold text-primary">3 seconds</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Message-specific</td>
+                            <td class="text-center text-gray-600">Generic AI</td>
+                            <td class="text-center text-gray-600">Grammar only</td>
+                            <td class="text-center font-bold text-primary">Purpose-built</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Learns your style</td>
+                            <td class="text-center">❌</td>
+                            <td class="text-center text-gray-600">Basic</td>
+                            <td class="text-center text-2xl">✅</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Pre-configured styles</td>
+                            <td class="text-center">❌</td>
+                            <td class="text-center">❌</td>
+                            <td class="text-center text-2xl">✅</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Price</td>
+                            <td class="text-center text-gray-600">$20/month</td>
+                            <td class="text-center text-gray-600">$12-15/month</td>
+                            <td class="text-center font-bold text-primary">$9/month</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Works everywhere</td>
+                            <td class="text-center text-gray-600">Separate tab</td>
+                            <td class="text-center text-gray-600">Browser only</td>
+                            <td class="text-center font-bold text-primary">Any app</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p class="text-center text-gray-600 mt-8 italic">
+                "Think of Clarity as Claude's focused younger sibling who specialized in messages and became the best at it."
+            </p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gradient-to-br from-gray-50 to-indigo-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Simple Pricing. No Tricks.</h2>
+                <p class="text-xl text-gray-600">Start free, upgrade when you're ready</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Free Tier -->
+                <div class="bg-white rounded-2xl p-8 border-2 border-gray-200 hover-lift">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Free</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$0</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">10 rewrites per day</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">3 core styles</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Basic rewriting</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Email support</span>
+                        </li>
+                    </ul>
+                    <button onclick="alert('Connect to your signup flow')" class="w-full bg-gray-100 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-200 transition font-semibold">
+                        Start Free
+                    </button>
+                </div>
+                
+                <!-- Pro Tier (Most Popular) -->
+                <div class="bg-gradient-to-br from-primary to-indigo-700 rounded-2xl p-8 border-2 border-primary transform scale-105 shadow-2xl relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-accent text-white px-4 py-1 rounded-full text-sm font-bold">MOST POPULAR</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Pro</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">$9</span>
+                        <span class="text-indigo-200">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">Unlimited rewrites</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">All 7+ style options</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">Context learning</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">Rewrite history</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">Priority support</span>
+                        </li>
+                    </ul>
+                    <button onclick="alert('Connect to your signup flow')" class="w-full bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-50 transition font-semibold shadow-lg">
+                        Start 7-Day Free Trial
+                    </button>
+                    <p class="text-center text-indigo-200 text-sm mt-3">No credit card required</p>
+                </div>
+                
+                <!-- Team Tier -->
+                <div class="bg-white rounded-2xl p-8 border-2 border-gray-200 hover-lift">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Team</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$15</span>
+                        <span class="text-gray-600">/user/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Everything in Pro</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Team style guides</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Brand voice consistency</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Usage analytics</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Shared templates</span>
+                        </li>
+                    </ul>
+                    <button onclick="alert('Connect to your sales contact form')" class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                        Contact Sales
+                    </button>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-gray-700 font-medium text-lg mb-2">
+                    Try Pro risk-free for 7 days
+                </p>
+                <p class="text-gray-600">
+                    If you don't love it, we'll refund 100%. No questions asked.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Join 2,000+ Professionals Who Write Better, Faster
+                </h2>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            M
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-gray-900">Michael T.</div>
+                            <div class="text-sm text-gray-600">Product Designer</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <h4 class="font-bold text-gray-900 mb-2">"Saved my relationship with my boss"</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        I was about to send the angriest email of my career. Clarity translated my rage into clear, assertive feedback. My boss actually thanked me for the honesty.
+                    </p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            P
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-gray-900">Priya S.</div>
+                            <div class="text-sm text-gray-600">Startup Founder</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <h4 class="font-bold text-gray-900 mb-2">"My LinkedIn response rate tripled"</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        I used to spend 30 minutes crafting each outreach message. Now it takes 3 minutes and they're better. Game-changer for networking.
+                    </p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-cyan-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            C
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-gray-900">Carlos R.</div>
+                            <div class="text-sm text-gray-600">Engineering Lead</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <h4 class="font-bold text-gray-900 mb-2">"Emails don't sound robotic anymore"</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        English is my second language. Clarity makes my messages sound natural and confident. Huge confidence boost.
+                    </p>
+                </div>
+                
+                <!-- Testimonial 4 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            J
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-gray-900">Jamie L.</div>
+                            <div class="text-sm text-gray-600">Marketing Manager</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <h4 class="font-bold text-gray-900 mb-2">"ADHD brain meets professional communication"</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        My thoughts come out like word salad. Clarity organizes them without losing my personality. I actually enjoy writing emails now.
+                    </p>
+                </div>
+                
+                <!-- Testimonial 5 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-red-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            D
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-gray-900">David K.</div>
+                            <div class="text-sm text-gray-600">Sales Director</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <h4 class="font-bold text-gray-900 mb-2">"ROI was immediate"</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Closed a $50K deal because my proposal email was clear and persuasive. Clarity paid for itself 500x over in month one.
+                    </p>
+                </div>
+                
+                <!-- Testimonial 6 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                            S
+                        </div>
+                        <div class="ml-4">
+                            <div class="font-bold text-gray-900">Sarah W.</div>
+                            <div class="text-sm text-gray-600">Freelance Designer</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <h4 class="font-bold text-gray-900 mb-2">"Therapy for my inbox"</h4>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        I used to have 47 email drafts I was too anxious to send. Now I write, rewrite, and send with confidence. My inbox anxiety is gone.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Questions? We've Got Answers.</h2>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- FAQ 1 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        Is Clarity better than ChatGPT/Claude for messages?
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        For message writing specifically, yes. We're 3x faster (no tab switching), pre-configured for communication styles, and learn your personal voice. ChatGPT is like a Swiss Army knife—great for everything. We're the chef's knife—perfect for one job, used 10x more often.
+                    </p>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        Does it work on mobile?
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Absolutely! Our web app works on any device with a browser. No app installation needed. Type or paste in Safari/Chrome on your phone, get your rewrite, and paste it wherever you need it.
+                    </p>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        Do you store my messages?
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        No. By default, we process your message and delete it immediately. Pro users can opt-in to save rewrite history (30 days) for convenience, but it's always encrypted and never used for AI training.
+                    </p>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        What if I don't like the rewrite?
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Hit "Try Another" for a different version, or use the result as a starting point and edit. You're always in control. The AI is a suggestion, not a replacement for your judgment.
+                    </p>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        Do you offer refunds?
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Yes! 7-day money-back guarantee on Pro, no questions asked. If it doesn't save you time and stress, we don't deserve your money.
+                    </p>
+                </div>
+                
+                <!-- FAQ 6 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">
+                        How is this different from Grammarly?
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Grammarly fixes grammar and suggests tone. We completely rewrite your message. Think of Grammarly as spell-check++. We're a communication translator.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-primary to-indigo-700 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                Stop Struggling With Words.<br>
+                Start Communicating Clearly.
+            </h2>
+            <p class="text-xl text-indigo-100 mb-8">
+                Join 2,000+ professionals who never stress about messages again.
+            </p>
+            
+            <div class="flex flex-col items-center gap-4 mb-8">
+                <div class="flex items-center gap-2 text-indigo-100">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Write 10x faster
+                </div>
+                <div class="flex items-center gap-2 text-indigo-100">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Sound more professional
+                </div>
+                <div class="flex items-center gap-2 text-indigo-100">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Never send a regrettable message
+                </div>
+            </div>
+            
+            <a href="#pricing" class="inline-block bg-white text-primary px-10 py-5 rounded-lg hover:bg-gray-100 transition font-bold text-xl shadow-2xl transform hover:-translate-y-1">
+                Start Writing Free — No Credit Card Required
+            </a>
+            
+            <p class="text-indigo-200 mt-6">
+                Upgrade to Pro anytime for unlimited rewrites. 7-day money-back guarantee.
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4">Clarity</h3>
+                    <p class="text-sm leading-relaxed">
+                        Your thoughts, clearly said. AI-powered message clarity for professionals.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#how-it-works" class="hover:text-white transition">How It Works</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition">Chrome Extension</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">About</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-sm">&copy; 2025 Clarity. All rights reserved.</p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition">Twitter</a>
+                    <a href="#" class="hover:text-white transition">LinkedIn</a>
+                    <a href="mailto:hello@writeclarity.com" class="hover:text-white transition">hello@writeclarity.com</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Try counter and API configuration
+        let triesRemaining = 2;
+        const API_ENDPOINT = '/api/rewrite'; // Your Vercel backend endpoint
+        
+        // Demo functionality
+        const transformBtn = document.getElementById('transform-btn');
+        const demoOutput = document.getElementById('demo-output');
+        const demoInput = document.getElementById('demo-input');
+        const outputContent = document.getElementById('output-content');
+        const copyBtn = document.getElementById('copy-btn');
+        
+        // Style selection
+        const styleButtons = document.querySelectorAll('.style-btn');
+        let selectedStyle = 'professional';
+        
+        styleButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                styleButtons.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-white', 'border-primary');
+                    b.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                });
+                this.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
+                this.classList.add('bg-primary', 'text-white', 'border-primary');
+                selectedStyle = this.getAttribute('data-style');
+            });
+        });
+        
+        // Transform button
+        if (transformBtn) {
+            transformBtn.addEventListener('click', async function() {
+                if (triesRemaining <= 0) {
+                    showSignupPrompt();
+                    return;
+                }
+                
+                const inputText = demoInput.value.trim();
+                if (!inputText) {
+                    alert('Please enter some text first!');
+                    return;
+                }
+                
+                // Show loading state
+                transformBtn.innerHTML = '⏳ Transforming...';
+                transformBtn.disabled = true;
+                
+                try {
+                    // Call your backend API
+                    const response = await fetch(API_ENDPOINT, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            text: inputText,
+                            style: selectedStyle
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API request failed');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Display result
+                    outputContent.innerHTML = data.result.replace(/\n/g, '<br>');
+                    demoOutput.classList.remove('hidden');
+                    demoOutput.classList.add('fade-in');
+                    
+                    // Update tries
+                    triesRemaining--;
+                    updateTriesDisplay();
+                    
+                    // Scroll to output
+                    demoOutput.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Sorry, there was an error processing your message. Please try again.');
+                } finally {
+                    transformBtn.innerHTML = 'Transform Message';
+                    transformBtn.disabled = false;
+                    updateTriesDisplay();
+                }
+            });
+        }
+        
+        // Copy to clipboard
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function() {
+                const text = outputContent.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    copyBtn.innerHTML = '✓ Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = 'Copy to Clipboard';
+                    }, 2000);
+                });
+            });
+        }
+        
+        function updateTriesDisplay() {
+            if (triesRemaining === 1) {
+                transformBtn.innerHTML = `Transform Message (${triesRemaining} try left)`;
+            } else if (triesRemaining === 0) {
+                transformBtn.innerHTML = 'Sign Up for More';
+                transformBtn.classList.remove('bg-primary', 'hover:bg-indigo-700');
+                transformBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+            } else {
+                transformBtn.innerHTML = `Transform Message (${triesRemaining} tries left)`;
+            }
+        }
+        
+        function showSignupPrompt() {
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+                    <div class="text-center">
+                        <div class="text-6xl mb-4">🎉</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">
+                            You've Used Your Free Tries!
+                        </h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Sign up now to get <strong>10 free rewrites per day</strong> forever. No credit card required.
+                        </p>
+                        <a href="#pricing" onclick="this.closest('.fixed').remove()" class="block w-full bg-primary text-white px-6 py-4 rounded-lg hover:bg-indigo-700 transition font-semibold text-lg mb-3">
+                            Start Free Account
+                        </a>
+                        <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-sm">
+                            Maybe later
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+        }
+        
+        // Initialize
+        updateTriesDisplay();
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href === '#' || href === '#pricing') {
+                    const target = document.querySelector(href === '#' ? 'body' : href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
