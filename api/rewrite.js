@@ -1,15 +1,15 @@
 // api/rewrite.js
-// Serverless function for Vercel that handles message rewriting with authentication
+// Serverless function for Vercel - FIXED VERSION
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_KEY // Use service key for admin access
+  process.env.SUPABASE_SERVICE_KEY
 );
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -37,61 +37,72 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Style is required' });
     }
     
+    // Check environment variables
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('ANTHROPIC_API_KEY is not set');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
+    
     // Check if user is authenticated
     const authHeader = req.headers.authorization;
     let userId = null;
     let userTier = 'free';
+    let userData = null;
     
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       
-      // Verify the token with Supabase
-      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-      
-      if (user) {
-        userId = user.id;
+      try {
+        // Verify the token with Supabase
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token);
         
-        // Get user data from database
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', userId)
-          .single();
-        
-        if (userData) {
-          userTier = userData.tier;
+        if (user && !authError) {
+          userId = user.id;
           
-          // Check usage limits for free tier
-          if (userTier === 'free') {
-            const today = new Date().toISOString().split('T')[0];
+          // Get user data from database
+          const { data: userRecord, error: userError } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', userId)
+            .single();
+          
+          if (userRecord && !userError) {
+            userData = userRecord;
+            userTier = userData.tier || 'free';
             
-            // Reset counter if it's a new day
-            if (userData.last_rewrite_date !== today) {
-              await supabase
-                .from('users')
-                .update({
-                  rewrites_today: 0,
-                  last_rewrite_date: today
-                })
-                .eq('id', userId);
+            // Check usage limits for free tier
+            if (userTier === 'free') {
+              const today = new Date().toISOString().split('T')[0];
               
-              userData.rewrites_today = 0;
-            }
-            
-            // Check if user has reached daily limit
-            if (userData.rewrites_today >= 10) {
-              return res.status(429).json({
-                error: 'Daily limit reached',
-                message: 'You\'ve used all 10 free rewrites today. Upgrade to Pro for unlimited access.',
-                remaining: 0
-              });
+              // Reset counter if it's a new day
+              if (userData.last_rewrite_date !== today) {
+                await supabase
+                  .from('users')
+                  .update({
+                    rewrites_today: 0,
+                    last_rewrite_date: today
+                  })
+                  .eq('id', userId);
+                
+                userData.rewrites_today = 0;
+              }
+              
+              // Check if user has reached daily limit
+              if (userData.rewrites_today >= 10) {
+                return res.status(429).json({
+                  error: 'Daily limit reached',
+                  message: 'You\'ve used all 10 free rewrites today. Upgrade to Pro for unlimited access.',
+                  remaining: 0
+                });
+              }
             }
           }
         }
+      } catch (authErr) {
+        console.error('Auth error:', authErr);
+        // Continue without auth - treat as logged out user
       }
     }
-    
-    // For logged-out users, no usage tracking (handled on frontend with 2-try limit)
     
     // Call Claude API
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -114,36 +125,51 @@ export default async function handler(req, res) {
     if (!claudeResponse.ok) {
       const errorText = await claudeResponse.text();
       console.error('Claude API error:', errorText);
-      return res.status(500).json({ error: 'AI service error' });
+      return res.status(500).json({ error: 'AI service error', details: errorText });
     }
     
     const claudeData = await claudeResponse.json();
     const rewrittenText = claudeData.content[0].text;
     
     // If user is logged in, update usage and save to history
-    if (userId) {
-      // Increment rewrite counter
-      await supabase.rpc('increment_rewrites', { user_id: userId });
-      
-      // Save to rewrite history
-      await supabase
-        .from('rewrites')
-        .insert({
-          user_id: userId,
-          input_text: text,
-          output_text: rewrittenText,
-          style: style
-        });
+    if (userId && userData) {
+      try {
+        // Increment rewrite counter
+        await supabase
+          .from('users')
+          .update({
+            rewrites_today: (userData.rewrites_today || 0) + 1,
+            rewrites_total: (userData.rewrites_total || 0) + 1,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', userId);
+        
+        // Save to rewrite history
+        await supabase
+          .from('rewrites')
+          .insert({
+            user_id: userId,
+            input_text: text,
+            output_text: rewrittenText,
+            style: style
+          });
+      } catch (dbError) {
+        console.error('Database error:', dbError);
+        // Don't fail the request if database update fails
+      }
     }
     
     return res.status(200).json({
       result: rewrittenText,
-      remaining: userTier === 'free' ? (9 - (userData?.rewrites_today || 0)) : 999
+      remaining: userTier === 'free' && userData ? (10 - ((userData.rewrites_today || 0) + 1)) : 999
     });
     
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message 
+    });
   }
 }
 
