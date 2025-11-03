@@ -1,5 +1,5 @@
 // api/rewrite.js
-// Serverless function for Vercel - FIXED VERSION
+// Serverless function for Vercel - UPDATED WITH NEW PRICING
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -70,31 +70,55 @@ module.exports = async function handler(req, res) {
             userData = userRecord;
             userTier = userData.tier || 'free';
             
-            // Check usage limits for free tier
-            if (userTier === 'free') {
-              const today = new Date().toISOString().split('T')[0];
+            // Check usage limits based on tier
+            const dailyLimits = {
+              'free': 3,
+              'standard': 10,
+              'pro': 20
+            };
+            
+            const userLimit = dailyLimits[userTier] || 3;
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Reset counter if it's a new day
+            if (userData.last_rewrite_date !== today) {
+              await supabase
+                .from('users')
+                .update({
+                  rewrites_today: 0,
+                  last_rewrite_date: today
+                })
+                .eq('id', userId);
               
-              // Reset counter if it's a new day
-              if (userData.last_rewrite_date !== today) {
-                await supabase
-                  .from('users')
-                  .update({
-                    rewrites_today: 0,
-                    last_rewrite_date: today
-                  })
-                  .eq('id', userId);
+              userData.rewrites_today = 0;
+            }
+            
+            // Check if user has reached daily limit
+            if (userData.rewrites_today >= userLimit) {
+              const upgradeMessage = userTier === 'free' 
+                ? 'You\'ve used all 3 free rewrites today. Upgrade to Standard ($9/month) for 10 rewrites/day.'
+                : userTier === 'standard'
+                ? 'You\'ve used all 10 rewrites today. Upgrade to Pro ($15/month) for 20 rewrites/day.'
+                : 'You\'ve reached your daily limit of 20 rewrites.';
                 
-                userData.rewrites_today = 0;
-              }
-              
-              // Check if user has reached daily limit
-              if (userData.rewrites_today >= 10) {
-                return res.status(429).json({
-                  error: 'Daily limit reached',
-                  message: 'You\'ve used all 10 free rewrites today. Upgrade to Pro for unlimited access.',
-                  remaining: 0
-                });
-              }
+              return res.status(429).json({
+                error: 'Daily limit reached',
+                message: upgradeMessage,
+                remaining: 0
+              });
+            }
+            
+            // Check if user is trying to use a paid style on free tier
+            const freeStyles = ['professional', 'direct', 'email'];
+            const paidStyles = ['persuasive', 'casual', 'formal', 'empathetic'];
+            
+            if (userTier === 'free' && paidStyles.includes(style.toLowerCase())) {
+              return res.status(403).json({
+                error: 'Premium style',
+                message: `The "${style}" style is only available on Standard ($9/month) and Pro ($15/month) plans. Upgrade to access all 7 styles!`,
+                remaining: userLimit - (userData.rewrites_today || 0)
+              });
             }
           }
         }
@@ -114,7 +138,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1024,
+        max_tokens: style.toLowerCase() === 'email' ? 2048 : 1024,
         messages: [{
           role: 'user',
           content: getPromptForStyle(text, style)
@@ -159,9 +183,20 @@ module.exports = async function handler(req, res) {
       }
     }
     
+    // Calculate remaining rewrites
+    const dailyLimits = {
+      'free': 3,
+      'standard': 10,
+      'pro': 20
+    };
+    const userLimit = dailyLimits[userTier] || 3;
+    const remaining = userTier === 'free' && userData 
+      ? (userLimit - ((userData.rewrites_today || 0) + 1))
+      : userLimit;
+    
     return res.status(200).json({
       result: rewrittenText,
-      remaining: userTier === 'free' && userData ? (10 - ((userData.rewrites_today || 0) + 1)) : 999
+      remaining: remaining
     });
     
   } catch (error) {
@@ -183,12 +218,17 @@ ${text}
 
 Transform this into a professional message:`,
     
-    friendly: `Transform this message into a warm, friendly communication. Keep it natural and conversational while being clear. Do not add greetings or closings unless they're in the original.
+    email: `Transform this into a complete, professional email. Create a full email format with:
+- An appropriate greeting (use a generic greeting like "Hi," or "Hello," unless a specific name is mentioned)
+- A clear, well-structured body that expands on the key points
+- A professional closing (use "Best regards," or "Thank you,")
+
+Make the email longer and more detailed than the input, adding context and clarity while maintaining a professional tone. The output should be a ready-to-send email.
 
 Input:
 ${text}
 
-Transform this into a friendly message:`,
+Transform this into a complete professional email:`,
     
     direct: `Transform this into a clear, concise, direct message. Get straight to the point. Remove unnecessary words while being respectful. Do not add greetings or closings unless they're in the original.
 
@@ -202,8 +242,29 @@ Transform this into a direct message:`,
 Input:
 ${text}
 
-Transform this into a persuasive message:`
+Transform this into a persuasive message:`,
+    
+    casual: `Transform this into a relaxed, informal message. Keep it natural and conversational, like you're talking to a colleague or friend. Maintain clarity but drop the formality. Do not add greetings or closings unless they're in the original.
+
+Input:
+${text}
+
+Transform this into a casual message:`,
+    
+    formal: `Transform this into a highly formal, polished communication. Use sophisticated language appropriate for executives, legal contexts, or official documents. Maintain absolute professionalism. Do not add greetings or closings unless they're in the original.
+
+Input:
+${text}
+
+Transform this into a formal message:`,
+    
+    empathetic: `Transform this into a compassionate, understanding message. Show genuine care and consideration for the recipient's perspective and feelings. Be warm, supportive, and tactful. Do not add greetings or closings unless they're in the original.
+
+Input:
+${text}
+
+Transform this into an empathetic message:`
   };
   
-  return stylePrompts[style] || stylePrompts.professional;
+  return stylePrompts[style.toLowerCase()] || stylePrompts.professional;
 }
