@@ -1419,7 +1419,7 @@
                             if (line.trim()) {
                                 formatted.push(line);
                             } else {
-                                formatted.push('<br>');
+                                // Skip empty lines for single-spacing
                             }
                         }
                     }
@@ -1428,7 +1428,7 @@
                         formatted.push('</ul>');
                     }
                     
-                    return formatted.join('\n');
+                    return formatted.join('<br>');
                 }
                 
                 // Display result
