@@ -2,7 +2,7 @@
   "name": "ClarityText",
   "short_name": "ClarityText",
   "description": "Transform messy thoughts into polished messages in seconds",
-  "start_url": "/",
+  "start_url": "/app.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#6366F1",
@@ -27,7 +27,7 @@
       "name": "Quick Transform",
       "short_name": "Transform",
       "description": "Transform a message",
-      "url": "/#demo",
+      "url": "/app.html",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
