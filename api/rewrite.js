@@ -72,12 +72,12 @@ module.exports = async function handler(req, res) {
             
             // Check usage limits based on tier
             const dailyLimits = {
-              'free': 3,
+              'free': 2,
               'standard': 10,
               'pro': 20
             };
             
-            const userLimit = dailyLimits[userTier] || 3;
+            const userLimit = dailyLimits[userTier] || 2;
             
             const today = new Date().toISOString().split('T')[0];
             
@@ -97,7 +97,7 @@ module.exports = async function handler(req, res) {
             // Check if user has reached daily limit
             if (userData.rewrites_today >= userLimit) {
               const upgradeMessage = userTier === 'free' 
-                ? 'You\'ve used all 3 free rewrites today. Upgrade to Standard ($9/month) for 10 rewrites/day.'
+                ? 'You\'ve used all 2 free rewrites today. Upgrade to Standard ($9/month) for 10 rewrites/day.'
                 : userTier === 'standard'
                 ? 'You\'ve used all 10 rewrites today. Upgrade to Pro ($15/month) for 20 rewrites/day.'
                 : 'You\'ve reached your daily limit of 20 rewrites.';
@@ -185,11 +185,11 @@ module.exports = async function handler(req, res) {
     
     // Calculate remaining rewrites
     const dailyLimits = {
-      'free': 3,
+      'free': 2,
       'standard': 10,
       'pro': 20
     };
-    const userLimit = dailyLimits[userTier] || 3;
+    const userLimit = dailyLimits[userTier] || 2;
     const remaining = userTier === 'free' && userData 
       ? (userLimit - ((userData.rewrites_today || 0) + 1))
       : userLimit;
