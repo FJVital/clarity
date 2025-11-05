@@ -25,6 +25,19 @@
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>✨</text></svg>">
     
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ClarityText">
+    <meta name="theme-color" content="#6366F1">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="/icon-192.png">
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -130,12 +143,48 @@
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
         
+        /* Make demo image more readable on mobile */
+        @media (max-width: 768px) {
+            .hero-example {
+                padding: 1rem !important;
+            }
+            .hero-example img {
+                max-width: 100%;
+                height: auto;
+                transform: scale(1.1);
+                transform-origin: center;
+            }
+        }
+        
         .comparison-table td, .comparison-table th {
             padding: 16px;
         }
         
         .hidden {
             display: none;
+        }
+        
+        /* Additional mobile responsive fixes */
+        @media (max-width: 768px) {
+            .comparison-table td, .comparison-table th {
+                padding: 8px 4px;
+                font-size: 11px;
+            }
+        }
+        
+        /* Install App button */
+        .install-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            animation: pulse-button 2s infinite;
+        }
+        
+        @keyframes pulse-button {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
         
         /* Modal styles */
@@ -152,6 +201,14 @@
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Install App Button (PWA) -->
+    <button id="install-button" class="install-button hidden bg-primary text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition font-semibold flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        Install App
+    </button>
+    
     <!-- Navigation -->
     <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -342,8 +399,14 @@
                         <h2 class="text-3xl font-bold text-gray-900 mb-6">
                             Why use Clarity instead of ChatGPT/Claude?
                         </h2>
+                        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                            Great question! Think of us as ChatGPT/Claude's younger sibling who specialized in one thing and became the best at it.
+                        </p>
+                        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                            We're 3x faster (no tab switching), purpose-built for messages, and learn YOUR writing style.
+                        </p>
                         <p class="text-lg text-gray-700 leading-relaxed mb-6">
-                            Great question! Think of us as ChatGPT/Claude's younger sibling who specialized in one thing and became the best at it. We're 3x faster (no tab switching), purpose-built for messages, learn YOUR writing style, cost half the price if you only need message help, and integrate directly into Gmail, Slack, and LinkedIn. ChatGPT/Claude is like having a Swiss Army knife—we're the chef's knife, perfect for one job and used 10x more often.
+                            ChatGPT/Claude is like having a Swiss Army knife. We're the chef's knife, perfect for one job and used 10x more often.
                         </p>
                         <div class="grid md:grid-cols-2 gap-4 text-gray-700">
                             <div class="flex items-center gap-3">
@@ -1521,6 +1584,60 @@
         
         // Set default style button
         document.querySelector('.style-btn').click();
+        
+        // ============================================
+        
+        // ============================================
+        // PWA INSTALL PROMPT HANDLER
+        // ============================================
+        
+        let deferredPrompt;
+        const installButton = document.getElementById("install-button");
+        
+        window.addEventListener("beforeinstallprompt", (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show install button
+            installButton.classList.remove("hidden");
+        });
+        
+        installButton.addEventListener("click", async () => {
+            if (!deferredPrompt) {
+                return;
+            }
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response: ${outcome}`);
+            // Clear the deferred prompt
+            deferredPrompt = null;
+            // Hide button
+            installButton.classList.add("hidden");
+        });
+        
+        // Hide button if app is already installed
+        window.addEventListener("appinstalled", () => {
+            installButton.classList.add("hidden");
+            console.log("PWA was installed");
+        });
+        
+        // SERVICE WORKER REGISTRATION (PWA)
+        // ============================================
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('ServiceWorker registered:', registration);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
