@@ -1,5 +1,5 @@
 // ClarityText Service Worker
-const CACHE_NAME = 'claritytext-v1';
+const CACHE_NAME = 'claritytext-v2';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -68,4 +68,5 @@ self.addEventListener('activate', (event) => {
   );
   // Take control of all pages immediately
   return self.clients.claim();
+
 });
