@@ -1,8 +1,9 @@
-// ClarityText Service Worker
+// ClarityText Service Worker - v2
 const CACHE_NAME = 'claritytext-v2';
 const urlsToCache = [
   '/',
   '/index.html',
+  '/app.html',
   '/manifest.json'
 ];
 
@@ -11,7 +12,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log('Opened cache v2');
         return cache.addAll(urlsToCache);
       })
   );
@@ -60,6 +61,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -68,5 +70,4 @@ self.addEventListener('activate', (event) => {
   );
   // Take control of all pages immediately
   return self.clients.claim();
-
 });
