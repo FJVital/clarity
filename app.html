@@ -61,6 +61,40 @@
 </head>
 <body class="bg-gray-50">
     
+    <!-- TEMPORARY CACHE BUSTER - REMOVE AFTER PWA WORKS -->
+    <script>
+    (async function() {
+      if (!localStorage.getItem('claritytext_cache_cleared_v3')) {
+        console.log('🧹 Clearing old caches...');
+        
+        if ('serviceWorker' in navigator) {
+          try {
+            // Unregister all service workers
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+              await registration.unregister();
+            }
+            
+            // Delete all caches
+            const cacheNames = await caches.keys();
+            for (let cacheName of cacheNames) {
+              await caches.delete(cacheName);
+            }
+            
+            // Mark as cleared
+            localStorage.setItem('claritytext_cache_cleared_v3', 'true');
+            
+            console.log('✅ Caches cleared! Reloading...');
+            setTimeout(() => window.location.reload(true), 1000);
+          } catch (error) {
+            console.error('Cache clear error:', error);
+          }
+        }
+      }
+    })();
+    </script>
+    <!-- END TEMPORARY CACHE BUSTER -->
+    
     <!-- Header -->
     <header class="bg-white shadow-sm">
         <div class="max-w-4xl mx-auto px-4 py-4">
@@ -69,11 +103,20 @@
                     <img src="/icon-192.png" alt="ClarityText" class="w-10 h-10">
                     <h1 class="text-xl font-bold text-primary">ClarityText</h1>
                 </div>
-                <div class="flex items-center gap-4">
+                
+                <!-- Logged IN Header -->
+                <div id="logged-in-header" class="flex items-center gap-4 hidden">
                     <span id="user-email" class="text-sm text-gray-600"></span>
                     <button onclick="handleLogout()" class="text-sm text-gray-700 hover:text-primary transition font-medium">
                         Logout
                     </button>
+                </div>
+                
+                <!-- Logged OUT Header -->
+                <div id="logged-out-header" class="flex items-center gap-4">
+                    <a href="/" class="text-sm text-gray-700 hover:text-primary transition font-medium">
+                        Sign Up
+                    </a>
                 </div>
             </div>
             <div class="mt-3 text-center">
@@ -185,91 +228,78 @@
     <!-- Footer Buttons -->
     <footer class="max-w-4xl mx-auto px-4 py-8">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
             <!-- Upgrade to Standard -->
             <button 
                 id="upgrade-standard-btn"
-                onclick="handleUpgradeStandard()" 
-                class="bg-green-600 text-white px-6 py-4 rounded-lg hover:bg-green-700 transition font-semibold shadow-lg">
-                Upgrade to Standard
-                <div class="text-xs mt-1 opacity-90">$9/month - 10 rewrites/day</div>
+                onclick="handleUpgradeStandard()"
+                class="bg-gradient-to-r from-primary to-indigo-700 text-white px-6 py-4 rounded-xl hover:shadow-2xl transition font-semibold text-center">
+                <div class="text-lg font-bold">Upgrade to Standard</div>
+                <div class="text-sm opacity-90 mt-1">$9/month - 10 rewrites/day</div>
             </button>
             
             <!-- Upgrade to Pro -->
             <button 
                 id="upgrade-pro-btn"
-                onclick="handleUpgradePro()" 
-                class="bg-blue-600 text-white px-6 py-4 rounded-lg hover:bg-blue-700 transition font-semibold shadow-lg">
-                Upgrade to Pro
-                <div class="text-xs mt-1 opacity-90">$15/month - 20 rewrites/day</div>
+                onclick="handleUpgradePro()"
+                class="bg-gradient-to-r from-accent to-orange-600 text-white px-6 py-4 rounded-xl hover:shadow-2xl transition font-semibold text-center">
+                <div class="text-lg font-bold">Upgrade to Pro</div>
+                <div class="text-sm opacity-90 mt-1">$15/month - 20 rewrites/day</div>
             </button>
             
-            <!-- Go to Website -->
-            <a 
-                href="https://claritytext.app" 
-                target="_blank"
-                class="bg-orange-600 text-white px-6 py-4 rounded-lg hover:bg-orange-700 transition font-semibold shadow-lg text-center">
-                Go to claritytext.app
-                <div class="text-xs mt-1 opacity-90">Learn more about ClarityText</div>
-            </a>
+            <!-- Help -->
+            <button 
+                onclick="window.location.href='/'"
+                class="bg-gray-100 text-gray-700 px-6 py-4 rounded-xl hover:bg-gray-200 transition font-semibold text-center border-2 border-gray-300">
+                <div class="text-lg font-bold">Need Help?</div>
+                <div class="text-sm mt-1">Visit our homepage</div>
+            </button>
+            
         </div>
     </footer>
 
+    <!-- JavaScript -->
     <script>
         // ============================================
-        // SUPABASE CONFIGURATION
+        // CONFIGURATION
         // ============================================
+        
         const SUPABASE_URL = 'https://ieeujkkggjufhmztvdyr.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZXVqa2tnZ2p1ZmhtenR2ZHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTEzNDgsImV4cCI6MjA3NzQyNzM0OH0.DwW8tiEzxHalnGETO9gfVpD257S_7-OJ6qRjoI25NH8';
         
-        // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
-        // API endpoint for rewriting
         const API_ENDPOINT = '/api/rewrite';
         
-        // Global variables
+        // Global state
         let selectedStyle = 'professional';
         let currentUser = null;
         let userTier = 'free';
-        let rewritesRemaining = 0;
+        let rewritesRemaining = 2;
+        let isLoggedIn = false;
         
         // ============================================
-        // INITIALIZATION
-        // ============================================
-        
-        // Check authentication on page load
-        window.addEventListener('DOMContentLoaded', async () => {
-            await checkAuth();
-        });
-        
-        // Listen for auth state changes
-        supabase.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN') {
-                currentUser = session.user;
-                await loadUserData();
-                updateUI();
-            } else if (event === 'SIGNED_OUT') {
-                window.location.href = '/index.html';
-            }
-        });
-        
-        // ============================================
-        // AUTHENTICATION FUNCTIONS
+        // AUTHENTICATION CHECK
         // ============================================
         
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session) {
+                // User is logged in
+                isLoggedIn = true;
                 currentUser = session.user;
                 await loadUserData();
-                updateUI();
+                updateUIForLoggedIn();
             } else {
-                // Redirect to landing page if not logged in
-                window.location.href = '/index.html';
+                // User is logged out - use localStorage for free tier
+                isLoggedIn = false;
+                loadFreeUsage();
+                updateUIForLoggedOut();
             }
         }
         
+        // Load user data from database (logged in)
         async function loadUserData() {
             const { data, error } = await supabase
                 .from('users')
@@ -278,30 +308,71 @@
                 .single();
             
             if (data) {
-                userTier = data.tier;
-                const limits = { 'free': 2, 'standard': 10, 'pro': 20 };
-                rewritesRemaining = limits[data.tier] ? (limits[data.tier] - data.rewrites_today) : 999;
+                userTier = data.tier || 'free';
+                
+                // Calculate remaining rewrites
+                const dailyLimits = { 'free': 2, 'standard': 10, 'pro': 20 };
+                const today = new Date().toISOString().split('T')[0];
+                
+                if (data.last_rewrite_date === today) {
+                    rewritesRemaining = dailyLimits[userTier] - (data.rewrites_today || 0);
+                } else {
+                    rewritesRemaining = dailyLimits[userTier];
+                }
             }
         }
         
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            window.location.href = '/index.html';
+        // Load free tier usage from localStorage (logged out)
+        function loadFreeUsage() {
+            const today = new Date().toISOString().split('T')[0];
+            const storedData = localStorage.getItem('claritytext_usage');
+            
+            if (storedData) {
+                const usage = JSON.parse(storedData);
+                
+                if (usage.date === today) {
+                    rewritesRemaining = 2 - usage.count;
+                } else {
+                    // New day - reset counter
+                    rewritesRemaining = 2;
+                    localStorage.setItem('claritytext_usage', JSON.stringify({ date: today, count: 0 }));
+                }
+            } else {
+                // First time user
+                rewritesRemaining = 2;
+                localStorage.setItem('claritytext_usage', JSON.stringify({ date: today, count: 0 }));
+            }
+        }
+        
+        // Update localStorage after rewrite (logged out)
+        function incrementFreeUsage() {
+            const today = new Date().toISOString().split('T')[0];
+            const storedData = localStorage.getItem('claritytext_usage');
+            
+            if (storedData) {
+                const usage = JSON.parse(storedData);
+                usage.count++;
+                localStorage.setItem('claritytext_usage', JSON.stringify(usage));
+            }
         }
         
         // ============================================
-        // UI UPDATE FUNCTIONS
+        // UI UPDATES
         // ============================================
         
-        function updateUI() {
+        function updateUIForLoggedIn() {
+            // Show logged-in header, hide logged-out header
+            document.getElementById('logged-in-header').classList.remove('hidden');
+            document.getElementById('logged-out-header').classList.add('hidden');
+            
             // Update user email
             document.getElementById('user-email').textContent = currentUser.email;
             
             // Update rewrites counter
             const counterEl = document.getElementById('rewrites-counter');
             if (userTier === 'free') {
-                counterEl.textContent = `${rewritesRemaining} rewrites remaining today`;
-            } else if (userTier === 'standard' || userTier === 'pro') {
+                counterEl.textContent = `${rewritesRemaining} of 2 free rewrites remaining today`;
+            } else {
                 const limits = { 'standard': 10, 'pro': 20 };
                 counterEl.textContent = `${rewritesRemaining} of ${limits[userTier]} rewrites remaining today`;
             }
@@ -314,11 +385,41 @@
                 document.getElementById('upgrade-pro-btn').style.display = 'none';
             }
             
-            // Update PRO badges based on tier
+            // Remove PRO badges if user has paid tier
             if (userTier !== 'free') {
                 document.querySelectorAll('.paid-badge').forEach(badge => {
                     badge.style.display = 'none';
                 });
+            }
+        }
+        
+        function updateUIForLoggedOut() {
+            // Show logged-out header, hide logged-in header
+            document.getElementById('logged-out-header').classList.remove('hidden');
+            document.getElementById('logged-in-header').classList.add('hidden');
+            
+            // Update rewrites counter
+            const counterEl = document.getElementById('rewrites-counter');
+            counterEl.textContent = `${rewritesRemaining} of 2 free rewrites remaining today`;
+            
+            // Show all upgrade buttons
+            document.getElementById('upgrade-standard-btn').style.display = 'block';
+            document.getElementById('upgrade-pro-btn').style.display = 'block';
+        }
+        
+        // Update counter after transform
+        function updateCounter() {
+            const counterEl = document.getElementById('rewrites-counter');
+            
+            if (isLoggedIn) {
+                if (userTier === 'free') {
+                    counterEl.textContent = `${rewritesRemaining} of 2 free rewrites remaining today`;
+                } else {
+                    const limits = { 'standard': 10, 'pro': 20 };
+                    counterEl.textContent = `${rewritesRemaining} of ${limits[userTier]} rewrites remaining today`;
+                }
+            } else {
+                counterEl.textContent = `${rewritesRemaining} of 2 free rewrites remaining today`;
             }
         }
         
@@ -331,7 +432,7 @@
             const paidStyles = ['persuasive', 'casual', 'formal', 'empathetic'];
             
             if (paidStyles.includes(style) && userTier === 'free') {
-                // Free user trying to use paid style
+                // Free user (logged in or out) trying to use paid style
                 const upgradeConfirm = confirm(
                     `The "${style}" style is only available on Standard ($9/month) and Pro ($15/month) plans.\n\nUpgrade now to access all 7 styles?`
                 );
@@ -377,12 +478,13 @@
             
             // Check usage limits
             if (rewritesRemaining <= 0) {
-                if (userTier === 'free') {
-                    if (confirm('You\'ve used all 2 free rewrites today. Upgrade to Standard for 10 rewrites/day?')) {
-                        handleUpgradeStandard();
-                    }
-                } else {
+                if (isLoggedIn && userTier !== 'free') {
                     alert(`You've used all your rewrites for today. Your limit resets tomorrow!`);
+                } else {
+                    // Free user (logged in or out)
+                    if (confirm('You\'ve used all 2 free rewrites today. Sign up for Standard to get 10 rewrites/day?')) {
+                        window.location.href = '/';
+                    }
                 }
                 return;
             }
@@ -392,16 +494,16 @@
             transformBtn.disabled = true;
             
             try {
-                // Get session token
+                // Get session token (null if logged out)
                 const { data: { session } } = await supabase.auth.getSession();
-                const token = session?.access_token;
+                const token = session?.access_token || null;
                 
                 // Call backend API
                 const response = await fetch(API_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        ...(token && { 'Authorization': `Bearer ${token}` })
                     },
                     body: JSON.stringify({
                         text: inputText,
@@ -411,18 +513,24 @@
                 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error || 'Transformation failed');
+                    throw new Error(errorData.message || errorData.error || 'Transformation failed');
                 }
                 
                 const result = await response.json();
                 
                 // Display result
-                outputContent.textContent = result.output;
+                outputContent.textContent = result.result;
                 outputEl.classList.remove('hidden');
                 
                 // Update usage
                 rewritesRemaining--;
-                updateUI();
+                
+                if (!isLoggedIn) {
+                    // Update localStorage for free tier
+                    incrementFreeUsage();
+                }
+                
+                updateCounter();
                 
                 // Scroll to output
                 outputEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -453,18 +561,34 @@
         }
         
         // ============================================
+        // LOGOUT
+        // ============================================
+        
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            // Don't redirect - just reload to show logged-out state
+            window.location.reload();
+        }
+        
+        // ============================================
         // UPGRADE FUNCTIONS
         // ============================================
         
         function handleUpgradeStandard() {
-            alert('Stripe integration coming soon!\n\nStandard Plan: $9/month\n- 10 rewrites per day\n- All 7 writing styles\n- Rewrite history (30 days)\n- Priority support');
-            // TODO: Integrate Stripe checkout
+            // Redirect to landing page signup
+            window.location.href = '/#pricing';
         }
         
         function handleUpgradePro() {
-            alert('Stripe integration coming soon!\n\nPro Plan: $15/month\n- 20 rewrites per day\n- All 7+ writing styles\n- Context learning\n- Unlimited rewrite history\n- Priority support + Live chat');
-            // TODO: Integrate Stripe checkout
+            // Redirect to landing page signup
+            window.location.href = '/#pricing';
         }
+        
+        // ============================================
+        // INITIALIZE ON PAGE LOAD
+        // ============================================
+        
+        checkAuth();
         
     </script>
     
