@@ -1,7 +1,7 @@
-// ClarityText Service Worker - v3 (AGGRESSIVE UPDATE)
-const CACHE_NAME = 'claritytext-v3';
+// ClarityText Service Worker - v4 (TIMESTAMPED MANIFEST)
+const CACHE_NAME = 'claritytext-v4';
 const urlsToCache = [
-  '/manifest-v2.json',
+  '/manifest-1762802428.json',
   '/icon-192.png',
   '/icon-512.png'
 ];
