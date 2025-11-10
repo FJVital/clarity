@@ -1,5 +1,5 @@
-// ClarityText Service Worker - v4 (TIMESTAMPED MANIFEST)
-const CACHE_NAME = 'claritytext-v4';
+// ClarityText Service Worker - v5 (WITH PWA REDIRECT FIX)
+const CACHE_NAME = 'claritytext-v5';
 const urlsToCache = [
   '/manifest-1762802428.json',
   '/icon-192.png',
@@ -8,7 +8,7 @@ const urlsToCache = [
 
 // Install event - cache only essentials, NOT app.html or index.html
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing v3 - clearing old caches');
+  console.log('[SW] Installing v5 - clearing old caches');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -24,7 +24,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - DELETE ALL OLD CACHES
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating v3 - nuking all old caches');
+  console.log('[SW] Activating v5 - nuking all old caches');
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
