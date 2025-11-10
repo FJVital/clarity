@@ -201,6 +201,28 @@
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- PWA Redirect Script - MUST BE FIRST -->
+    <script>
+        // Detect if running as installed PWA and redirect to app.html
+        // This bypasses manifest caching issues by redirecting at runtime
+        (function() {
+            // Check if running in standalone mode (installed PWA)
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+                              || window.navigator.standalone  // iOS Safari
+                              || document.referrer.includes('android-app://'); // Android TWA
+            
+            // Also check URL parameter that manifest adds
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPWASource = urlParams.get('source') === 'pwa' || urlParams.get('source') === 'shortcut';
+            
+            // If running as PWA and not already on app.html, redirect
+            if ((isStandalone || isPWASource) && !window.location.pathname.includes('app.html')) {
+                console.log('[PWA Redirect] Detected PWA mode, redirecting to app.html');
+                window.location.replace('/app.html?source=pwa');
+            }
+        })();
+    </script>
+    
     <!-- Install App Button (PWA) -->
     <button id="install-button" class="install-button hidden bg-primary text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition font-semibold flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,31 +261,6 @@
         </div>
     </nav>
 
-    <!-- App Install Banner -->
-    <div id="app-install-banner" class="hidden bg-gradient-to-r from-primary to-indigo-700 text-white py-4 px-4 fixed top-16 w-full z-40 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 text-center sm:text-left">
-                <svg class="w-8 h-8 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                </svg>
-                <div>
-                    <p class="font-bold text-lg">📱 Install ClarityText App</p>
-                    <p class="text-sm text-indigo-100">Quick access from your home screen • Works offline • No app store needed</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <button id="banner-install-btn" class="bg-white text-primary px-6 py-2 rounded-lg font-bold hover:bg-indigo-50 transition shadow-md">
-                    Install Now
-                </button>
-                <button onclick="closeInstallBanner()" class="text-white hover:text-indigo-100 transition">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Hero Section -->
     <section class="pt-32 pb-20 px-4 relative overflow-hidden bg-gradient-to-br from-white to-indigo-50">
         <div class="max-w-7xl mx-auto">
@@ -283,7 +280,7 @@
                             See How It Works
                         </a>
                     </div>
-                    <div class="flex items-center gap-6 text-2xl text-gray-600">
+                    <div class="flex items-center gap-6 text-sm text-gray-600">
                         <span class="flex items-center gap-2">
                             <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
@@ -417,7 +414,7 @@
             <div class="text-center mb-12">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">See It In Action</h2>
                 <p class="text-xl text-gray-600 mb-3">Try it yourself with a real example</p>
-                <p id="demo-subtitle" class="text-2xl text-primary font-semibold">
+                <p id="demo-subtitle" class="text-sm text-primary font-semibold">
                     <!-- Will be updated by JavaScript based on auth state -->
                 </p>
             </div>
@@ -557,74 +554,6 @@
                         Correct but stiff → natural and fluent. Sound like a native speaker without years of practice.
                     </p>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Install App Section -->
-    <section class="py-20 bg-gradient-to-br from-primary to-indigo-700 text-white">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-5xl font-bold mb-6">📱 Install as an App</h2>
-                <p class="text-2xl text-indigo-100 mb-4">Get instant access from your home screen • Works offline • No app store needed</p>
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-8 mb-12">
-                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
-                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                        </svg>
-                        On Mobile
-                    </h3>
-                    <ol class="space-y-3 text-lg text-indigo-100">
-                        <li class="flex gap-3">
-                            <span class="font-bold text-white">1.</span>
-                            <span>Tap the <strong>Share button</strong> (iOS) or <strong>Menu</strong> (Android)</span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="font-bold text-white">2.</span>
-                            <span>Select <strong>"Add to Home Screen"</strong> or <strong>"Install app"</strong></span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="font-bold text-white">3.</span>
-                            <span>Tap <strong>Add/Install</strong></span>
-                        </li>
-                    </ol>
-                </div>
-                
-                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
-                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-3">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        On Desktop
-                    </h3>
-                    <ol class="space-y-3 text-lg text-indigo-100">
-                        <li class="flex gap-3">
-                            <span class="font-bold text-white">1.</span>
-                            <span>Look for the <strong>install icon</strong> in the address bar</span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="font-bold text-white">2.</span>
-                            <span>Or click the <strong>⋮ menu</strong> → <strong>Install ClarityText</strong></span>
-                        </li>
-                        <li class="flex gap-3">
-                            <span class="font-bold text-white">3.</span>
-                            <span>Click <strong>Install</strong> in the popup</span>
-                        </li>
-                    </ol>
-                </div>
-            </div>
-            
-            <!-- Dynamic Install Button -->
-            <div class="text-center">
-                <button id="install-section-btn" class="hidden bg-white text-primary px-10 py-5 rounded-xl hover:bg-indigo-50 transition font-bold text-xl shadow-2xl">
-                    ⬇️ Click to Install Now
-                </button>
-                <p id="install-status-msg" class="text-xl text-indigo-100 mt-4">
-                    <!-- Will be updated by JavaScript -->
-                </p>
             </div>
         </div>
     </section>
@@ -1043,7 +972,7 @@
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                     </svg>
-                    <span class="text-2xl">No credit card required</span>
+                    <span>No credit card required</span>
                 </div>
                 <div class="flex items-center gap-2 text-indigo-100">
                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -1172,7 +1101,7 @@
                 </button>
                 
                 <h2 class="text-3xl font-bold text-gray-900 mb-2">Start Writing Free</h2>
-                <p class="text-2xl text-gray-600 mb-6">2 free rewrites daily. No credit card required.</p>
+                <p class="text-gray-600 mb-6">2 free rewrites daily. No credit card required.</p>
                 
                 <form onsubmit="handleSignup(event)" class="space-y-4">
                     <div>
@@ -1626,116 +1555,36 @@
         
         let deferredPrompt;
         const installButton = document.getElementById("install-button");
-        const installBanner = document.getElementById("app-install-banner");
-        const bannerInstallBtn = document.getElementById("banner-install-btn");
-        const installSectionBtn = document.getElementById("install-section-btn");
-        const installStatusMsg = document.getElementById("install-status-msg");
-        
-        // Check if app is already installed
-        function checkIfInstalled() {
-            // Check if running as PWA
-            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-                console.log('✅ App is already installed and running as PWA');
-                installStatusMsg.textContent = '✅ App is already installed! You can access it from your home screen.';
-                installStatusMsg.classList.add('text-green-300');
-                return true;
-            }
-            console.log('ℹ️ App is not installed yet');
-            return false;
-        }
-        
-        // Update install status
-        function updateInstallStatus() {
-            if (checkIfInstalled()) {
-                return;
-            }
-            
-            if (deferredPrompt) {
-                console.log('✅ Install prompt is available');
-                installStatusMsg.textContent = '👆 Click the button above for quick install, or use the manual instructions.';
-            } else {
-                console.log('ℹ️ Install prompt not available yet - showing manual instructions');
-                installStatusMsg.textContent = '👆 Use the manual instructions above to install the app.';
-            }
-        }
         
         window.addEventListener("beforeinstallprompt", (e) => {
-            console.log('🎉 beforeinstallprompt event fired! App is installable.');
             // Prevent the mini-infobar from appearing on mobile
             e.preventDefault();
             // Stash the event so it can be triggered later
             deferredPrompt = e;
-            // Show install button AND banner AND section button
+            // Show install button
             installButton.classList.remove("hidden");
-            installBanner.classList.remove("hidden");
-            installSectionBtn.classList.remove("hidden");
-            updateInstallStatus();
         });
         
-        // Function to trigger install
-        async function triggerInstall() {
+        installButton.addEventListener("click", async () => {
             if (!deferredPrompt) {
-                console.log('❌ Install prompt not available');
-                alert('Install is not available yet. Please use the manual instructions above, or try visiting the site again later.');
                 return;
             }
-            console.log('🚀 Triggering install prompt');
             // Show the install prompt
             deferredPrompt.prompt();
             // Wait for the user to respond
             const { outcome } = await deferredPrompt.userChoice;
             console.log(`User response: ${outcome}`);
-            
-            if (outcome === 'accepted') {
-                console.log('✅ User accepted the install');
-            } else {
-                console.log('❌ User dismissed the install');
-            }
-            
             // Clear the deferred prompt
             deferredPrompt = null;
-            // Hide button and banner
+            // Hide button
             installButton.classList.add("hidden");
-            installBanner.classList.add("hidden");
-            installSectionBtn.classList.add("hidden");
-            updateInstallStatus();
-        }
-        
-        // Connect all install buttons
-        installButton.addEventListener("click", triggerInstall);
-        bannerInstallBtn.addEventListener("click", triggerInstall);
-        installSectionBtn.addEventListener("click", triggerInstall);
-        
-        // Function to close banner
-        function closeInstallBanner() {
-            installBanner.classList.add("hidden");
-            // Store in localStorage so it doesn't show again this session
-            localStorage.setItem('install-banner-dismissed', 'true');
-        }
-        
-        // Check if banner was dismissed this session
-        if (localStorage.getItem('install-banner-dismissed') === 'true') {
-            installBanner.classList.add('hidden');
-        }
-        
-        // Hide button and banner if app is already installed
-        window.addEventListener("appinstalled", () => {
-            console.log("🎉 PWA was installed successfully!");
-            installButton.classList.add("hidden");
-            installBanner.classList.add("hidden");
-            installSectionBtn.classList.add("hidden");
-            installStatusMsg.textContent = '✅ App installed successfully! You can now access it from your home screen.';
-            installStatusMsg.classList.add('text-green-300');
         });
         
-        // Initial status check
-        setTimeout(() => {
-            updateInstallStatus();
-            console.log('=== PWA Install Status ===');
-            console.log('Is installed?', checkIfInstalled());
-            console.log('Install prompt available?', !!deferredPrompt);
-            console.log('========================');
-        }, 1000);
+        // Hide button if app is already installed
+        window.addEventListener("appinstalled", () => {
+            installButton.classList.add("hidden");
+            console.log("PWA was installed");
+        });
         
         // SERVICE WORKER REGISTRATION (PWA)
         // ============================================
