@@ -201,24 +201,43 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- PWA Redirect Script - MUST BE FIRST -->
+    <!-- PWA Redirect Script v2 - MUST BE FIRST -->
     <script>
         // Detect if running as installed PWA and redirect to app.html
         // This bypasses manifest caching issues by redirecting at runtime
         (function() {
+            console.log('[PWA Redirect v2] Script executing...');
+            console.log('[PWA Redirect v2] Current URL:', window.location.href);
+            console.log('[PWA Redirect v2] Pathname:', window.location.pathname);
+            
             // Check if running in standalone mode (installed PWA)
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
                               || window.navigator.standalone  // iOS Safari
                               || document.referrer.includes('android-app://'); // Android TWA
             
+            console.log('[PWA Redirect v2] Standalone check:', {
+                matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+                navigatorStandalone: window.navigator.standalone,
+                referrer: document.referrer
+            });
+            
             // Also check URL parameter that manifest adds
             const urlParams = new URLSearchParams(window.location.search);
             const isPWASource = urlParams.get('source') === 'pwa' || urlParams.get('source') === 'shortcut';
             
+            console.log('[PWA Redirect v2] URL params source:', urlParams.get('source'));
+            console.log('[PWA Redirect v2] isPWASource:', isPWASource);
+            
             // If running as PWA and not already on app.html, redirect
-            if ((isStandalone || isPWASource) && !window.location.pathname.includes('app.html')) {
-                console.log('[PWA Redirect] Detected PWA mode, redirecting to app.html');
+            const shouldRedirect = (isStandalone || isPWASource) && !window.location.pathname.includes('app.html');
+            
+            console.log('[PWA Redirect v2] Should redirect?', shouldRedirect);
+            
+            if (shouldRedirect) {
+                console.log('[PWA Redirect v2] ✅ REDIRECTING to app.html');
                 window.location.replace('/app.html?source=pwa');
+            } else {
+                console.log('[PWA Redirect v2] ❌ Not redirecting');
             }
         })();
     </script>
@@ -1593,10 +1612,27 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
-                        console.log('ServiceWorker registered:', registration);
+                        console.log('✅ ServiceWorker registered:', registration);
+                        
+                        // Check for updates every time the page loads
+                        registration.update();
+                        
+                        // Listen for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            console.log('🔄 New service worker found, installing...');
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('✅ New service worker installed! Reloading page...');
+                                    // New service worker available, reload the page
+                                    window.location.reload();
+                                }
+                            });
+                        });
                     })
                     .catch((error) => {
-                        console.log('ServiceWorker registration failed:', error);
+                        console.log('❌ ServiceWorker registration failed:', error);
                     });
             });
         }
@@ -1605,4 +1641,3 @@
     
 </body>
 </html>
-
