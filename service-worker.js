@@ -1,5 +1,5 @@
-// ClarityText Service Worker - v7 (NUCLEAR CACHE CLEAR)
-const CACHE_NAME = 'claritytext-v7';
+// ClarityText Service Worker - v7.1 (Fixed extension filtering)
+const CACHE_NAME = 'claritytext-v7-1';
 const urlsToCache = [
   '/manifest.json',
   '/icon-192.png',
@@ -8,15 +8,15 @@ const urlsToCache = [
 
 // Install event - FORCE IMMEDIATE ACTIVATION
 self.addEventListener('install', (event) => {
-  console.log('[SW v7] Installing - NUCLEAR CACHE CLEAR MODE');
+  console.log('[SW v7.1] Installing - NUCLEAR CACHE CLEAR MODE');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('[SW v7] Caching essentials');
+        console.log('[SW v7.1] Caching essentials');
         return cache.addAll(urlsToCache);
       })
       .then(() => {
-        console.log('[SW v7] Forcing immediate activation');
+        console.log('[SW v7.1] Forcing immediate activation');
         return self.skipWaiting();
       })
   );
@@ -24,16 +24,16 @@ self.addEventListener('install', (event) => {
 
 // Activate event - DELETE EVERYTHING
 self.addEventListener('activate', (event) => {
-  console.log('[SW v7] ACTIVATING - DELETING ALL OLD CACHES');
+  console.log('[SW v7.1] ACTIVATING - DELETING ALL OLD CACHES');
   event.waitUntil(
     Promise.all([
       // Delete all old caches
       caches.keys().then((cacheNames) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
-            console.log('[SW v7] Checking cache:', cacheName);
+            console.log('[SW v7.1] Checking cache:', cacheName);
             if (cacheName !== CACHE_NAME) {
-              console.log('[SW v7] DELETING old cache:', cacheName);
+              console.log('[SW v7.1] DELETING old cache:', cacheName);
               return caches.delete(cacheName);
             }
           })
@@ -42,14 +42,23 @@ self.addEventListener('activate', (event) => {
       // Take control immediately
       self.clients.claim()
     ]).then(() => {
-      console.log('[SW v7] All old caches deleted, now in control');
+      console.log('[SW v7.1] All old caches deleted, now in control');
     })
   );
 });
 
 // Fetch event - NETWORK FIRST for ALL HTML
 self.addEventListener('fetch', (event) => {
+  // CRITICAL: Ignore non-HTTP(S) requests (extensions, chrome://, etc.)
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+  
+  // CRITICAL: Only handle requests from our origin
   const url = new URL(event.request.url);
+  if (url.origin !== location.origin) {
+    return;
+  }
   
   // For ALL navigation and HTML requests: ALWAYS fetch fresh from network
   if (event.request.mode === 'navigate' || 
@@ -58,7 +67,7 @@ self.addEventListener('fetch', (event) => {
       url.pathname === '/app.html' ||
       url.pathname === '/index.html') {
     
-    console.log('[SW v7] Network-first for HTML:', url.pathname);
+    console.log('[SW v7.1] Network-first for HTML:', url.pathname);
     event.respondWith(
       fetch(event.request)
         .then(response => {
@@ -75,7 +84,7 @@ self.addEventListener('fetch', (event) => {
   
   // For manifest.json: ALWAYS fetch fresh (never cache)
   if (url.pathname.includes('manifest')) {
-    console.log('[SW v7] Always fetching fresh manifest');
+    console.log('[SW v7.1] Always fetching fresh manifest');
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
     );
@@ -91,7 +100,7 @@ self.addEventListener('fetch', (event) => {
         }
         
         return fetch(event.request).then((response) => {
-          if (!response || response.status !== 200) {
+          if (!response || response.status !== 200 || response.type === 'error') {
             return response;
           }
           
@@ -109,7 +118,7 @@ self.addEventListener('fetch', (event) => {
 // Listen for skip waiting messages
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
-    console.log('[SW v7] Received SKIP_WAITING message');
+    console.log('[SW v7.1] Received SKIP_WAITING message');
     self.skipWaiting();
   }
 });
