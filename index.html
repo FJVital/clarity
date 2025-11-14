@@ -201,24 +201,43 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- PWA Redirect Script - MUST BE FIRST -->
+    <!-- PWA Redirect Script v2 - MUST BE FIRST -->
     <script>
         // Detect if running as installed PWA and redirect to app.html
         // This bypasses manifest caching issues by redirecting at runtime
         (function() {
+            console.log('[PWA Redirect v2] Script executing...');
+            console.log('[PWA Redirect v2] Current URL:', window.location.href);
+            console.log('[PWA Redirect v2] Pathname:', window.location.pathname);
+            
             // Check if running in standalone mode (installed PWA)
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
                               || window.navigator.standalone  // iOS Safari
                               || document.referrer.includes('android-app://'); // Android TWA
             
+            console.log('[PWA Redirect v2] Standalone check:', {
+                matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+                navigatorStandalone: window.navigator.standalone,
+                referrer: document.referrer
+            });
+            
             // Also check URL parameter that manifest adds
             const urlParams = new URLSearchParams(window.location.search);
             const isPWASource = urlParams.get('source') === 'pwa' || urlParams.get('source') === 'shortcut';
             
+            console.log('[PWA Redirect v2] URL params source:', urlParams.get('source'));
+            console.log('[PWA Redirect v2] isPWASource:', isPWASource);
+            
             // If running as PWA and not already on app.html, redirect
-            if ((isStandalone || isPWASource) && !window.location.pathname.includes('app.html')) {
-                console.log('[PWA Redirect] Detected PWA mode, redirecting to app.html');
+            const shouldRedirect = (isStandalone || isPWASource) && !window.location.pathname.includes('app.html');
+            
+            console.log('[PWA Redirect v2] Should redirect?', shouldRedirect);
+            
+            if (shouldRedirect) {
+                console.log('[PWA Redirect v2] ✅ REDIRECTING to app.html');
                 window.location.replace('/app.html?source=pwa');
+            } else {
+                console.log('[PWA Redirect v2] ❌ Not redirecting');
             }
         })();
     </script>
@@ -272,32 +291,34 @@
                     <p class="text-xl text-gray-600 mb-8 leading-relaxed">
                         Write like you think. AI makes it professional. Never struggle with words again.
                     </p>
-                    <div class="flex flex-col sm:flex-row gap-4 mb-8">
-                        <button onclick="scrollToDemo()" class="bg-primary text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition font-semibold text-lg shadow-lg">
+                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                        <button onclick="scrollToDemo()" class="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition font-semibold text-lg shadow-lg">
                             Start Writing Free
                         </button>
-                        <button id="hero-install-button" onclick="handleHeroInstall()" class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition font-semibold text-lg shadow-lg flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="#how-it-works" class="bg-orange-500 text-white px-8 py-4 rounded-lg hover:bg-orange-600 transition font-semibold text-lg text-center shadow-lg">
+                            See How It Works
+                        </a>
+                    </div>
+                    <div class="mb-8">
+                        <button id="hero-install-button" onclick="handleHeroInstall()" class="w-full bg-green-600 text-white px-10 py-5 rounded-xl hover:bg-green-700 transition font-bold text-xl shadow-xl flex items-center justify-center gap-3">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                             <span id="hero-install-text">Install App</span>
                         </button>
-                        <a href="#how-it-works" class="border-2 border-primary text-primary px-8 py-4 rounded-lg hover:bg-indigo-50 transition font-semibold text-lg text-center">
-                            See How It Works
-                        </a>
                     </div>
-                    <div class="flex items-center gap-6 text-sm text-gray-600">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 text-xl text-gray-700">
                         <span class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
                             No credit card required
                         </span>
                         <span class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                             </svg>
-                            2 free rewrites daily
+                            2 free transformations - no signup required
                         </span>
                     </div>
                 </div>
@@ -1559,70 +1580,10 @@
         
         let deferredPrompt;
         const installButton = document.getElementById("install-button"); // Floating button
-        const heroInstallButton = document.getElementById("hero-install-button");
-        const heroInstallText = document.getElementById("hero-install-text");
         
-        // Check if already installed
-        function isAppInstalled() {
-            return window.matchMedia('(display-mode: standalone)').matches ||
-                   window.navigator.standalone === true;
-        }
-        
-        // Update hero button text based on status
-        function updateHeroButtonText() {
-            if (isAppInstalled()) {
-                heroInstallText.textContent = "Open App";
-            } else if (isIOSDevice()) {
-                heroInstallText.textContent = "Install App";
-            } else {
-                heroInstallText.textContent = "Install App";
-            }
-        }
-        
-        // Check if iOS
-        function isIOSDevice() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        }
-        
-        // Handle hero install button click
-        window.handleHeroInstall = async function() {
-            // If already installed, open the app
-            if (isAppInstalled()) {
-                window.location.href = '/app.html?source=pwa';
-                return;
-            }
-            
-            // If we have the deferred prompt (Chrome/Edge desktop/Android)
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`Install outcome: ${outcome}`);
-                if (outcome === 'accepted') {
-                    deferredPrompt = null;
-                    updateHeroButtonText();
-                }
-                return;
-            }
-            
-            // iOS install instructions
-            if (isIOSDevice()) {
-                alert(
-                    '📱 To install ClarityText on iOS:\n\n' +
-                    '1. Tap the Share button (square with arrow)\n' +
-                    '2. Scroll down and tap "Add to Home Screen"\n' +
-                    '3. Tap "Add" in the top right\n\n' +
-                    'The app will appear on your home screen!'
-                );
-                return;
-            }
-            
-            // Desktop Chrome/Edge - manual instructions
-            alert(
-                '💻 To install ClarityText:\n\n' +
-                '1. Look for the install icon (⊕) in your address bar\n' +
-                '2. Or click the menu (⋮) → "Install ClarityText..."\n\n' +
-                'The app will install to your desktop!'
-            );
+        // Handle hero install button click - Direct navigation to app
+        window.handleHeroInstall = function() {
+            window.location.href = '/app.html?source=pwa';
         };
         
         // Capture the beforeinstallprompt event
@@ -1632,37 +1593,32 @@
             deferredPrompt = e;
             
             // Show floating install button
-            installButton.classList.remove("hidden");
-            
-            // Update hero button (it's always visible)
-            updateHeroButtonText();
+            if (installButton) {
+                installButton.classList.remove("hidden");
+            }
         });
         
         // Handle floating install button
-        installButton.addEventListener("click", async () => {
-            if (!deferredPrompt) {
-                return;
-            }
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            console.log(`Floating button install: ${outcome}`);
-            deferredPrompt = null;
-            installButton.classList.add("hidden");
-            updateHeroButtonText();
-        });
+        if (installButton) {
+            installButton.addEventListener("click", async () => {
+                if (!deferredPrompt) {
+                    return;
+                }
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Floating button install: ${outcome}`);
+                deferredPrompt = null;
+                installButton.classList.add("hidden");
+            });
+        }
         
         // Handle app installed event
         window.addEventListener("appinstalled", () => {
             console.log("PWA was installed successfully!");
-            installButton.classList.add("hidden");
-            updateHeroButtonText();
-            
-            // Show success message
-            alert('🎉 ClarityText installed! You can now use it like a native app.');
+            if (installButton) {
+                installButton.classList.add("hidden");
+            }
         });
-        
-        // Update button text on page load
-        updateHeroButtonText();
         
         // SERVICE WORKER REGISTRATION (PWA)
         // ============================================
@@ -1692,6 +1648,9 @@
                     })
                     .catch((error) => {
                         console.log('❌ ServiceWorker registration failed:', error);
+                    })
+                    .catch((error) => {
+                        console.log('ServiceWorker registration failed:', error);
                     });
             });
         }
