@@ -90,7 +90,7 @@
     
     <!-- Success Banner (shown after successful upgrade) -->
     <div id="success-banner" class="hidden success-banner bg-green-600 text-white px-4 py-3 text-center">
-        <p class="font-semibold"> Welcome to <span id="success-tier"></span>! Your upgrade is active.</p>
+        <p class="font-semibold">🎉 Welcome to <span id="success-tier"></span>! Your upgrade is active.</p>
     </div>
 
     <!-- Cancel Banner (shown if user cancels checkout) -->
@@ -230,7 +230,7 @@
                 id="transform-btn"
                 onclick="transformMessage()"
                 class="w-full bg-primary text-white py-4 rounded-lg hover:bg-indigo-700 transition font-bold text-lg shadow-lg">
-                Transform Message
+                Transform Message ✨
             </button>
             
             <!-- Output (hidden by default) -->
@@ -260,13 +260,18 @@
                 <span class="hidden sm:inline">•</span>
                 <a href="/" class="hover:text-primary transition">Back to Home</a>
                 <span class="hidden sm:inline">•</span>
+                <a href="/privacy.html" class="hover:text-primary transition">Privacy</a>
+                <span class="hidden sm:inline">•</span>
+                <a href="/terms.html" class="hover:text-primary transition">Terms</a>
+                <span class="hidden sm:inline">•</span>
                 <span>© 2025 ClarityText</span>
             </div>
         </div>
     </footer>
 
+
     <!-- JavaScript -->
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ============================================
         // SUPABASE INITIALIZATION
         // ============================================
@@ -733,16 +738,3 @@
                 alert('Error accessing subscription management: ' + error.message);
             }
         }
-        
-        // ============================================
-        // INITIALIZE ON PAGE LOAD
-        // ============================================
-        
-        checkURLParams();
-        checkAuth();
-        
-    </script>
-    
-</body>
-
-</html>
