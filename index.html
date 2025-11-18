@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google Analytics GA4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-BHVQ2LCLZG"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-BHVQ2LCLZG');
-    </script>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Your messy thoughts → clear messages, instantly. AI-powered writing assistant that transforms bullet points into professional communication.">
@@ -219,63 +210,70 @@
             console.log('[PWA Redirect v2] Current URL:', window.location.href);
             console.log('[PWA Redirect v2] Pathname:', window.location.pathname);
             
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
-                                window.navigator.standalone === true ||
-                                document.referrer.includes('android-app://');
-                                
-            const isIndexPage = window.location.pathname === '/' || 
-                               window.location.pathname === '/index.html';
+            // Check if running in standalone mode (installed PWA)
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+                              || window.navigator.standalone  // iOS Safari
+                              || document.referrer.includes('android-app://'); // Android TWA
             
-            console.log('[PWA Redirect v2] isStandalone:', isStandalone);
-            console.log('[PWA Redirect v2] isIndexPage:', isIndexPage);
+            console.log('[PWA Redirect v2] Standalone check:', {
+                matchMedia: window.matchMedia('(display-mode: standalone)').matches,
+                navigatorStandalone: window.navigator.standalone,
+                referrer: document.referrer
+            });
             
-            // Only redirect if:
-            // 1. Running as PWA (standalone)
-            // 2. Currently on index/home page
-            // 3. Not already on app.html
-            if (isStandalone && isIndexPage) {
-                console.log('[PWA Redirect v2] ✅ Redirecting to /app.html');
-                window.location.replace('/app.html');
+            // Also check URL parameter that manifest adds
+            const urlParams = new URLSearchParams(window.location.search);
+            const isPWASource = urlParams.get('source') === 'pwa' || urlParams.get('source') === 'shortcut';
+            
+            console.log('[PWA Redirect v2] URL params source:', urlParams.get('source'));
+            console.log('[PWA Redirect v2] isPWASource:', isPWASource);
+            
+            // If running as PWA and not already on app.html, redirect
+            const shouldRedirect = (isStandalone || isPWASource) && !window.location.pathname.includes('app.html');
+            
+            console.log('[PWA Redirect v2] Should redirect?', shouldRedirect);
+            
+            if (shouldRedirect) {
+                console.log('[PWA Redirect v2] ✅ REDIRECTING to app.html');
+                window.location.replace('/app.html?source=pwa');
             } else {
                 console.log('[PWA Redirect v2] ❌ Not redirecting');
             }
         })();
     </script>
     
-    <!-- Install App Button (Floating) -->
-    <button id="install-button" class="install-button hidden bg-primary text-white px-6 py-3 rounded-full font-semibold shadow-2xl hover:bg-indigo-700 transition">
-        📱 Install App
+    <!-- Install App Button (PWA) -->
+    <button id="install-button" class="install-button hidden bg-primary text-white px-6 py-3 rounded-full hover:bg-indigo-700 transition font-semibold flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        Install App
     </button>
-
+    
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm">
+    <nav class="bg-white shadow-sm fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">✨</span>
-                    <span class="text-xl font-bold text-primary">ClarityText</span>
+                <div class="flex items-center">
+                    <a href="#" class="text-2xl font-bold text-primary">ClarityText</a>
                 </div>
-                
-                <!-- User Status -->
-                <div class="flex items-center gap-4">
-                    <!-- Show when NOT logged in -->
-                    <div id="logged-out-nav" class="flex items-center gap-4">
-                        <a href="#demo" class="text-gray-700 hover:text-primary transition font-medium">Try Free</a>
-                        <a href="#pricing" class="text-gray-700 hover:text-primary transition font-medium">Pricing</a>
-                        <button onclick="showSignupModal()" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold">
-                            Sign Up
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#how-it-works" class="text-gray-700 hover:text-primary transition">How It Works</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-primary transition">Pricing</a>
+                    <a href="#faq" class="text-gray-700 hover:text-primary transition">FAQ</a>
+                </div>
+                <div id="nav-auth-buttons" class="flex items-center space-x-4">
+                    <!-- Logged out state -->
+                    <div id="logged-out-nav">
+                        <button onclick="showLoginModal()" class="text-gray-700 hover:text-primary transition font-medium">Sign In</button>
+                        <button onclick="showSignupModal()" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                            Start Free
                         </button>
                     </div>
-                    
-                    <!-- Show when logged in -->
-                    <div id="logged-in-nav" class="hidden flex items-center gap-4">
-                        <span id="nav-user-email" class="text-sm text-gray-600"></span>
-                        <a href="/app.html" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold">
-                            Open App
-                        </a>
-                        <button onclick="handleNavLogout()" class="text-gray-700 hover:text-primary transition font-medium">
-                            Logout
-                        </button>
+                    <!-- Logged in state -->
+                    <div id="logged-in-nav" class="hidden flex items-center space-x-4">
+                        <span id="user-email" class="text-sm text-gray-600"></span>
+                        <button onclick="handleLogout()" class="text-gray-700 hover:text-primary transition font-medium">Logout</button>
                     </div>
                 </div>
             </div>
@@ -283,355 +281,939 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="py-20 px-4">
-        <div class="max-w-6xl mx-auto text-center">
-            <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6">
-                Your Thoughts,<br>
-                <span class="text-gradient">Clearly Said</span>
-            </h1>
-            <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Write like you think. AI makes it professional.<br>
-                Never struggle with words again.
-            </p>
-            
-            <!-- Three Buttons - Equal Size -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12 max-w-2xl mx-auto">
-                <a href="/app.html" class="flex-1 bg-primary text-white px-8 py-4 rounded-xl hover:bg-indigo-700 transition font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
-                    Open App
-                </a>
-                <button onclick="handleHeroInstall()" class="flex-1 bg-accent text-white px-8 py-4 rounded-xl hover:bg-orange-700 transition font-bold text-lg shadow-lg hover:shadow-xl hover:-translate-y-1">
-                    Install PWA
-                </button>
-                <button onclick="scrollToDemo()" class="flex-1 border-2 border-primary text-primary px-8 py-4 rounded-xl hover:bg-indigo-50 transition font-bold text-lg">
-                    Try Demo
-                </button>
-            </div>
-            
-            <!-- Hero Example/Demo Image -->
-            <div class="hero-example bg-white rounded-2xl shadow-2xl p-8 max-w-3xl mx-auto">
-                <img src="/input_output.png" alt="ClarityText Demo" class="w-full rounded-lg">
+    <section class="pt-32 pb-20 px-4 relative overflow-hidden bg-gradient-to-br from-white to-indigo-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                        Your Messy Thoughts → <span class="text-gradient">Clear Messages</span>, Instantly
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+                        Write like you think. AI makes it professional. Never struggle with words again.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                        <button onclick="scrollToDemo()" class="bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition font-semibold text-lg shadow-lg">
+                            Start Writing Free
+                        </button>
+                        <a href="#how-it-works" class="bg-orange-500 text-white px-8 py-4 rounded-lg hover:bg-orange-600 transition font-semibold text-lg text-center shadow-lg">
+                            See How It Works
+                        </a>
+                    </div>
+                    <div class="mb-8 w-full flex">
+                        <button id="hero-install-button" onclick="handleHeroInstall()" style="width: 74%;" class="bg-green-600 text-white px-8 py-4 rounded-lg hover:bg-green-700 transition font-semibold text-lg shadow-lg flex items-center justify-center gap-3">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span id="hero-install-text">Install App</span>
+                        </button>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 text-xl text-gray-700">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            No credit card required
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            2 free transformations - no signup required
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Hero Visual - Brad Example -->
+                <div class="relative animate-float">
+                    <div class="hero-example p-8">
+                        <img src="input_output.png" alt="Message transformation example" class="w-full h-auto rounded-lg">
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- Decorative Background Elements -->
+        <div class="absolute top-20 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float"></div>
+        <div class="absolute bottom-20 left-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-float" style="animation-delay: 1s;"></div>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-16 px-4 bg-white">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
-                Why ClarityText?
-            </h2>
+    <!-- Problem Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    You Know What You Want to Say.<br>
+                    The Words Just Won't Come Out Right.
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    You're not bad at communication. You just need a translator between your brain and "professional."
+                </p>
+            </div>
             
             <div class="grid md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="text-center hover-lift bg-gray-50 p-6 rounded-xl">
-                    <div class="text-5xl mb-4">⚡</div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-900">Instant Transformation</h3>
-                    <p class="text-gray-600" style="font-size: 20px;">
-                        Brain dump your messy thoughts. Get polished messages in seconds.
+                <!-- Pain Point 1 -->
+                <div class="bg-gray-50 rounded-xl p-8 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="email-paralysis.png" alt="Email Paralysis">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Email Paralysis</h3>
+                    <p class="text-gray-600 leading-relaxed text-center">
+                        You stare at a blank email for 10 minutes. You know what you mean, but it sounds wrong. So you write, delete, rewrite, delete again...
                     </p>
                 </div>
                 
-                <!-- Feature 2 -->
-                <div class="text-center hover-lift bg-gray-50 p-6 rounded-xl">
-                    <div class="text-5xl mb-4">🎯</div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-900">7 Powerful Styles</h3>
-                    <p class="text-gray-600" style="font-size: 20px;">
-                        Professional, persuasive, casual, direct, email, enthusiastic, or empathetic.
+                <!-- Pain Point 2 -->
+                <div class="bg-gray-50 rounded-xl p-8 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="angry-drafts.png" alt="Angry Drafts">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Angry Drafts</h3>
+                    <p class="text-gray-600 leading-relaxed text-center">
+                        You're upset. You type out your real feelings. But you know you can't send THAT. Now you need to translate rage into diplomacy.
                     </p>
                 </div>
                 
-                <!-- Feature 3 -->
-                <div class="text-center hover-lift bg-gray-50 p-6 rounded-xl">
-                    <div class="text-5xl mb-4">🧠</div>
-                    <h3 class="text-xl font-bold mb-3 text-gray-900">Powered by Claude Sonnet 4</h3>
-                    <p class="text-gray-600" style="font-size: 20px;">
-                        State-of-the-art AI understands context and nuance.
+                <!-- Pain Point 3 -->
+                <div class="bg-gray-50 rounded-xl p-8 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="overcomplicate-everything.png" alt="Overcomplicate Everything">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Overcomplicate Everything</h3>
+                    <p class="text-gray-600 leading-relaxed text-center">
+                        What should be a simple message turns into three paragraphs. Or worse—you make it so brief it sounds rude. Finding the middle ground is exhausting.
                     </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Interactive Demo Section -->
-    <section id="demo" class="py-16 px-4 bg-gray-50">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-                Try It Now - Free
-            </h2>
-            <p id="demo-subtitle" class="text-center text-gray-600 mb-8">
-                2 free transformations remaining (no signup needed)
-            </p>
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-20 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Write Like You Think. We Handle the Rest.
+                </h2>
+                <p class="text-xl text-gray-600">Three simple steps to better communication</p>
+            </div>
             
-            <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8">
-                <!-- Input -->
+            <div class="grid md:grid-cols-3 gap-12">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="icon-container mb-6">
+                        <img src="brain-dump.png" alt="Brain Dump">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">1. Brain Dump</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Type your messy, unfiltered thoughts. Bullet points. Stream of consciousness. Whatever's in your head.
+                    </p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="icon-container mb-6">
+                        <img src="choose-our-style.png" alt="Choose Your Style">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">2. Choose Your Style</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Pick the tone: Professional, Friendly, Direct, Persuasive, or "Cool Down This Anger."
+                    </p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="icon-container mb-6">
+                        <img src="copy-send.png" alt="Copy & Send">
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">3. Copy & Send</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        Get your polished message in 3 seconds. Copy it. Paste it anywhere. Done.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Interactive Demo Section -->
+    <section id="demo" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">See It In Action</h2>
+                <p class="text-xl text-gray-600 mb-3">Try it yourself with a real example</p>
+                <p id="demo-subtitle" class="text-sm text-primary font-semibold">
+                    <!-- Will be updated by JavaScript based on auth state -->
+                </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-gray-50 to-indigo-50 rounded-2xl p-8 border-2 border-primary shadow-xl">
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">
-                        Your messy thoughts:
-                    </label>
                     <textarea 
                         id="demo-input"
                         class="demo-input w-full h-32 p-4 border-2 border-gray-300 rounded-lg focus:border-primary focus:outline-none text-sm resize-none"
-                        placeholder="Example: need report done, john's numbers missing, deadline friday, tell everyone meet thursday 3pm review"></textarea>
+                        placeholder="Write all you think... don't worry about order, grammar, pronouns, or spelling. Just brain dump."></textarea>
                 </div>
                 
-                <!-- Style Selector -->
                 <div class="mb-6">
                     <label class="block text-sm font-semibold text-gray-700 mb-3">Choose style:</label>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <button onclick="selectDemoStyle('professional')" 
-                                class="demo-style-btn px-4 py-3 border-2 border-primary bg-primary text-white rounded-lg hover:bg-primary/90 transition font-medium text-sm" 
-                                data-style="professional">
+                        <button onclick="selectStyle('professional')" class="style-btn px-4 py-3 border-2 border-primary bg-primary text-white rounded-lg hover:border-primary hover:bg-primary/90 transition font-medium text-sm" data-style="professional">
                             Professional
                         </button>
-                        <button onclick="selectDemoStyle('direct')" 
-                                class="demo-style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm" 
-                                data-style="direct">
+                        <button onclick="selectStyle('direct')" class="style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm" data-style="direct">
                             Direct
                         </button>
-                        <button onclick="selectDemoStyle('email')" 
-                                class="demo-style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm" 
-                                data-style="email">
+                        <button onclick="selectStyle('email')" class="style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm" data-style="email">
                             Email
                         </button>
-                        <button onclick="selectDemoStyle('casual')" 
-                                class="demo-style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm" 
-                                data-style="casual">
+                        <button onclick="selectStyle('persuasive')" class="style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm relative" data-style="persuasive" data-paid="true">
+                            Persuasive
+                            <span class="paid-badge absolute -top-2 -right-2 bg-accent text-white text-[10px] px-2 py-0.5 rounded-full font-bold">PRO</span>
+                        </button>
+                        <button onclick="selectStyle('casual')" class="style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm relative" data-style="casual" data-paid="true">
                             Casual
+                            <span class="paid-badge absolute -top-2 -right-2 bg-accent text-white text-[10px] px-2 py-0.5 rounded-full font-bold">PRO</span>
+                        </button>
+                        <button onclick="selectStyle('formal')" class="style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm relative" data-style="formal" data-paid="true">
+                            Formal
+                            <span class="paid-badge absolute -top-2 -right-2 bg-accent text-white text-[10px] px-2 py-0.5 rounded-full font-bold">PRO</span>
+                        </button>
+                        <button onclick="selectStyle('empathetic')" class="style-btn px-4 py-3 border-2 border-gray-300 rounded-lg hover:border-primary hover:bg-indigo-50 transition font-medium text-sm relative" data-style="empathetic" data-paid="true">
+                            Empathetic
+                            <span class="paid-badge absolute -top-2 -right-2 bg-accent text-white text-[10px] px-2 py-0.5 rounded-full font-bold">PRO</span>
                         </button>
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">* 4 more styles available in paid plans</p>
+                    <p class="text-sm text-gray-500 text-center mt-3">
+                        <span class="font-semibold">Free:</span> Professional, Direct, Email · 
+                        <span class="font-semibold text-accent">Paid:</span> Persuasive, Casual, Formal, Empathetic
+                    </p>
                 </div>
                 
-                <!-- Transform Button -->
-                <button 
-                    id="demo-transform-btn"
-                    onclick="transformDemoMessage()"
-                    class="w-full bg-primary text-white py-4 rounded-lg hover:bg-indigo-700 transition font-bold text-lg shadow-lg">
-                    Transform Message ✨
+                <button id="transform-btn" onclick="handleTransform()" class="w-full bg-primary text-white px-6 py-4 rounded-lg hover:bg-indigo-700 transition font-semibold text-lg shadow-lg">
+                    Transform Message
                 </button>
                 
-                <!-- Output (hidden by default) -->
-                <div id="demo-output" class="mt-6 hidden">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-sm font-semibold text-gray-700">
-                            Transformed result:
-                        </label>
-                        <button 
-                            id="copy-btn"
-                            class="text-sm bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition font-medium">
-                            Copy to Clipboard
-                        </button>
+                <div id="demo-output" class="hidden mt-6">
+                    <div class="bg-white rounded-lg p-6 border-2 border-gray-200">
+                        <div id="output-content" class="text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
                     </div>
-                    <div id="output-content" class="p-4 bg-gray-50 border-2 border-gray-300 rounded-lg text-sm whitespace-pre-wrap"></div>
+                    <button id="copy-btn" class="mt-4 w-full bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-semibold">
+                        Copy to Clipboard
+                    </button>
                 </div>
-            </div>
-            
-            <!-- CTA after demo -->
-            <div class="text-center mt-8">
-                <p class="text-gray-600 mb-4">Want more? Sign up for 2 free rewrites daily.</p>
-                <button onclick="showSignupModal()" class="bg-accent text-white px-8 py-3 rounded-lg hover:bg-orange-700 transition font-bold text-lg shadow-lg">
-                    Sign Up Free
-                </button>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-16 px-4 bg-white">
-        <div class="max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">
-                Simple, Transparent Pricing
-            </h2>
-            <p class="text-center text-gray-600 mb-12">
-                Start free. Upgrade when you need more.
-            </p>
+    <!-- Use Cases Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    One Tool. Infinite Uses.
+                </h2>
+                <p class="text-xl text-gray-600">Your secret weapon for any written communication</p>
+            </div>
             
-            <!-- Pricing Table -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Use Case 1 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="professional-emails.png" alt="Professional Emails">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Professional Emails</h3>
+                    <p class="text-gray-600 text-center">
+                        Bullet points → polished messages. Perfect for busy designers, founders, and anyone who thinks faster than they type.
+                    </p>
+                </div>
+                
+                <!-- Use Case 2 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="networking-messages.png" alt="Networking Messages">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Networking Messages</h3>
+                    <p class="text-gray-600 text-center">
+                        LinkedIn reach-outs that don't sound robotic. Actually make connections instead of getting ignored.
+                    </p>
+                </div>
+                
+                <!-- Use Case 3 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="conflict-resolution.png" alt="Conflict Resolution">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Conflict Resolution</h3>
+                    <p class="text-gray-600 text-center">
+                        Angry draft → diplomatic message. Say what you need to say without burning bridges.
+                    </p>
+                </div>
+                
+                <!-- Use Case 4 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="sales-outreach.png" alt="Sales Outreach">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Sales Outreach</h3>
+                    <p class="text-gray-600 text-center">
+                        Generic pitch → personalized message. Stand out in crowded inboxes.
+                    </p>
+                </div>
+                
+                <!-- Use Case 5 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="quick-responses.png" alt="Quick Responses">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Quick Responses</h3>
+                    <p class="text-gray-600 text-center">
+                        "Yes" → "Thanks for checking! Yes, that works perfectly." Add warmth without overthinking.
+                    </p>
+                </div>
+                
+                <!-- Use Case 6 -->
+                <div class="bg-gray-50 rounded-xl p-6 hover-lift border border-gray-200">
+                    <div class="icon-container mb-4">
+                        <img src="non-native-speakers.png" alt="Non-Native Speakers">
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3 text-center">Non-Native Speakers</h3>
+                    <p class="text-gray-600 text-center">
+                        Correct but stiff → natural and fluent. Sound like a native speaker without years of practice.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Why Not Just Use ChatGPT or Claude?</h2>
+                <p class="text-xl text-gray-600">Great question. Here's the honest comparison.</p>
+            </div>
+            
             <div class="overflow-x-auto">
-                <table class="comparison-table w-full border-collapse bg-white shadow-xl rounded-xl overflow-hidden">
+                <table class="w-full bg-white rounded-xl shadow-lg overflow-hidden comparison-table">
                     <thead class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
                         <tr>
-                            <th class="text-left p-4 font-bold">Feature</th>
-                            <th class="p-4 font-bold">Free</th>
-                            <th class="p-4 font-bold bg-primary/20">Standard</th>
-                            <th class="p-4 font-bold">Pro</th>
+                            <th class="text-left p-4 font-semibold">Feature</th>
+                            <th class="text-center p-4 font-semibold">ChatGPT/Claude</th>
+                            <th class="text-center p-4 font-semibold">Grammarly</th>
+                            <th class="text-center p-4 font-semibold bg-primary">ClarityText</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4 font-semibold">Price</td>
-                            <td class="p-4 text-center">$0</td>
-                            <td class="p-4 text-center bg-indigo-50 font-bold text-primary">$9/mo</td>
-                            <td class="p-4 text-center font-bold text-accent">$15/mo</td>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Speed</td>
+                            <td class="text-center text-gray-600">30+ seconds</td>
+                            <td class="text-center text-gray-600">Instant</td>
+                            <td class="text-center font-bold text-primary">3 seconds</td>
                         </tr>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4 font-semibold">Rewrites per day</td>
-                            <td class="p-4 text-center">2</td>
-                            <td class="p-4 text-center bg-indigo-50 font-bold">10</td>
-                            <td class="p-4 text-center font-bold">20</td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Message-specific</td>
+                            <td class="text-center text-gray-600">Generic AI</td>
+                            <td class="text-center text-gray-600">Grammar only</td>
+                            <td class="text-center font-bold text-primary">Purpose-built</td>
                         </tr>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4 font-semibold">Free styles</td>
-                            <td class="p-4 text-center">3</td>
-                            <td class="p-4 text-center bg-indigo-50">7</td>
-                            <td class="p-4 text-center">7</td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Learns your style</td>
+                            <td class="text-center">❌</td>
+                            <td class="text-center text-gray-600">Basic</td>
+                            <td class="text-center text-2xl">✅</td>
                         </tr>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4 font-semibold">Pro styles</td>
-                            <td class="p-4 text-center">❌</td>
-                            <td class="p-4 text-center bg-indigo-50">✅</td>
-                            <td class="p-4 text-center">✅</td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Pre-configured styles</td>
+                            <td class="text-center">❌</td>
+                            <td class="text-center">❌</td>
+                            <td class="text-center text-2xl">✅</td>
                         </tr>
-                        <tr class="border-b hover:bg-gray-50">
-                            <td class="p-4 font-semibold">Best for</td>
-                            <td class="p-4 text-center text-sm">Testing</td>
-                            <td class="p-4 text-center bg-indigo-50 text-sm font-semibold">Regular users</td>
-                            <td class="p-4 text-center text-sm font-semibold">Power users</td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Price</td>
+                            <td class="text-center text-gray-600">$20/month</td>
+                            <td class="text-center text-gray-600">$12-15/month</td>
+                            <td class="text-center font-bold text-primary">$9/month</td>
                         </tr>
-                        <tr>
-                            <td class="p-4"></td>
-                            <td class="p-4 text-center">
-                                <button onclick="showSignupModal()" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 transition font-semibold">
-                                    Sign Up
-                                </button>
-                            </td>
-                            <td class="p-4 text-center bg-indigo-50">
-                                <button onclick="showSignupModal()" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition font-semibold shadow-lg">
-                                    Get Started
-                                </button>
-                            </td>
-                            <td class="p-4 text-center">
-                                <button onclick="showSignupModal()" class="bg-accent text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition font-semibold shadow-lg">
-                                    Get Started
-                                </button>
-                            </td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="font-medium text-gray-900">Works everywhere</td>
+                            <td class="text-center text-gray-600">Separate tab</td>
+                            <td class="text-center text-gray-600">Browser only</td>
+                            <td class="text-center font-bold text-primary">Any app</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            
+            <p class="text-center text-gray-600 mt-8 italic">
+                "Think of ClarityText as Claude's focused younger sibling who specialized in messages and became the best at it."
+            </p>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gradient-to-br from-gray-50 to-indigo-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Simple Pricing. No Tricks.</h2>
+                <p class="text-xl text-gray-600">Start free, upgrade when you're ready</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <!-- Free Tier -->
+                <div class="bg-white rounded-2xl p-8 border-2 border-gray-200 hover-lift">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Free</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$0</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700"><strong>2 rewrites per day</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700"><strong>3 core styles</strong><br><span class="text-sm text-gray-600">Professional, Direct, Email</span></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Basic rewriting</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Email support</span>
+                        </li>
+                    </ul>
+                    <button onclick="showSignupModal()" class="w-full bg-gray-100 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-200 transition font-semibold">
+                        Start Free
+                    </button>
+                </div>
+                
+                <!-- Standard Tier (Most Popular) -->
+                <div class="bg-gradient-to-br from-primary to-indigo-700 rounded-2xl p-8 border-2 border-primary transform scale-105 shadow-2xl relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-accent text-white px-4 py-1 rounded-full text-sm font-bold">MOST POPULAR</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-2">Standard</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">$9</span>
+                        <span class="text-indigo-200">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium"><strong>10 rewrites per day</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium"><strong>All 7 style options</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">Rewrite history (30 days)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-white mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-white font-medium">Priority email support</span>
+                        </li>
+                    </ul>
+                    <button onclick="alert('Stripe checkout coming soon! Standard plan: $9/month')" class="w-full bg-white text-primary px-6 py-3 rounded-lg hover:bg-gray-50 transition font-semibold shadow-lg">
+                        Upgrade to Standard
+                    </button>
+                </div>
+                
+                <!-- Pro Tier -->
+                <div class="bg-white rounded-2xl p-8 border-2 border-gray-200 hover-lift">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Pro</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-gray-900">$15</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700"><strong>20 rewrites per day</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700"><strong>All 7+ style options</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700"><strong>Context learning</strong><br><span class="text-sm text-gray-600">Learns your writing style</span></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700"><strong>Unlimited rewrite history</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-gray-700">Priority support + Live chat</span>
+                        </li>
+                    </ul>
+                    <button onclick="alert('Stripe checkout coming soon! Pro plan: $15/month')" class="w-full bg-gray-800 text-white px-6 py-3 rounded-lg hover:bg-black transition font-semibold">
+                        Upgrade to Pro
+                    </button>
+                </div>
+            </div>
+            
+            <p class="text-center text-gray-600 mt-8">
+                All plans include a <strong>7-day money-back guarantee</strong>. No questions asked.
+            </p>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    What People Are Saying
+                </h2>
+                <p class="text-xl text-gray-600">Real feedback from early users</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-indigo-600 flex items-center justify-center text-white font-bold text-xl">
+                            S
+                        </div>
+                        <div class="ml-3">
+                            <div class="font-semibold text-gray-900">Sarah Chen</div>
+                            <div class="text-sm text-gray-600">Product Designer</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <p class="text-gray-700 leading-relaxed">
+                        "I used to spend 20 minutes on a single email. Now it takes 30 seconds. This is a game-changer for designers who think visually but need to write professionally."
+                    </p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-red-600 flex items-center justify-center text-white font-bold text-xl">
+                            M
+                        </div>
+                        <div class="ml-3">
+                            <div class="font-semibold text-gray-900">Marcus Rodriguez</div>
+                            <div class="text-sm text-gray-600">Startup Founder</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <p class="text-gray-700 leading-relaxed">
+                        "As a non-native English speaker, this tool is incredible. I sound natural and professional instead of like I'm translating word-by-word."
+                    </p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-teal-600 flex items-center justify-center text-white font-bold text-xl">
+                            J
+                        </div>
+                        <div class="ml-3">
+                            <div class="font-semibold text-gray-900">Jessica Park</div>
+                            <div class="text-sm text-gray-600">Sales Manager</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <p class="text-gray-700 leading-relaxed">
+                        "My response rate increased by 40% after using ClarityText. Messages feel personal without taking forever to write."
+                    </p>
+                </div>
+                
+                <!-- Testimonial 4 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white font-bold text-xl">
+                            D
+                        </div>
+                        <div class="ml-3">
+                            <div class="font-semibold text-gray-900">David Thompson</div>
+                            <div class="text-sm text-gray-600">Freelance Developer</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <p class="text-gray-700 leading-relaxed">
+                        "I have ADHD and writing professional emails was torture. This tool gets me out of my own way. Just brain dump and done."
+                    </p>
+                </div>
+                
+                <!-- Testimonial 5 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center text-white font-bold text-xl">
+                            E
+                        </div>
+                        <div class="ml-3">
+                            <div class="font-semibold text-gray-900">Emily Wright</div>
+                            <div class="text-sm text-gray-600">Marketing Director</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <p class="text-gray-700 leading-relaxed">
+                        "Way better than ChatGPT for this specific use case. No more copy-pasting and waiting. It just works."
+                    </p>
+                </div>
+                
+                <!-- Testimonial 6 -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-600 flex items-center justify-center text-white font-bold text-xl">
+                            R
+                        </div>
+                        <div class="ml-3">
+                            <div class="font-semibold text-gray-900">Robert Kim</div>
+                            <div class="text-sm text-gray-600">Agency Owner</div>
+                        </div>
+                    </div>
+                    <div class="text-yellow-400 mb-3">★★★★★</div>
+                    <p class="text-gray-700 leading-relaxed">
+                        "My entire team uses this now. Consistency across all client communications without losing our personal touch."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="py-20 bg-gray-50">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Frequently Asked Questions
+                </h2>
+                <p class="text-xl text-gray-600">Everything you need to know</p>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- FAQ 1 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        Why not just use ChatGPT or Claude directly?
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Great question! While ChatGPT and Claude are powerful general-purpose AI tools, ClarityText is specifically optimized for message writing. We're 3x faster (no tab switching, no prompting), purpose-built with pre-configured communication styles, learn your personal writing style over time, and integrate directly into your workflow. Think of it like using Figma for design instead of Photoshop—both work, but one is built specifically for your use case.
+                    </p>
+                </div>
+                
+                <!-- FAQ 2 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        How is my data handled?
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Your privacy is paramount. Free tier messages are processed and immediately deleted. Pro tier users can opt-in to save rewrite history (encrypted). We never train AI models on your data, and everything is transmitted over encrypted HTTPS. Your messages are yours alone.
+                    </p>
+                </div>
+                
+                <!-- FAQ 3 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        What if I need more than 10 rewrites per day?
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Simply upgrade to Pro for $9/month and get unlimited rewrites. The free tier is designed to let you try the tool and see if it fits your workflow. Most active users upgrade within a week.
+                    </p>
+                </div>
+                
+                <!-- FAQ 4 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        Can I cancel anytime?
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Absolutely! No contracts, no commitments. Cancel your subscription anytime with one click. Plus, we offer a 7-day money-back guarantee if you're not satisfied.
+                    </p>
+                </div>
+                
+                <!-- FAQ 5 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        Do you have a browser extension or mobile app?
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Not yet, but they're coming soon! Right now, you can use ClarityText through our website on any device. The mobile-optimized version works great in your browser. Browser extensions and native apps are on our roadmap for Q1 2026.
+                    </p>
+                </div>
+                
+                <!-- FAQ 6 -->
+                <div class="bg-white rounded-xl p-6 border border-gray-200">
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">
+                        What languages do you support?
+                    </h3>
+                    <p class="text-gray-700 leading-relaxed">
+                        Currently, ClarityText works best with English. However, if you're a non-native English speaker writing in English, it's incredibly helpful for making your writing sound more natural and fluent. Support for Spanish, French, German, and other languages is planned for 2026.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                Ready to Stop Struggling with Words?
+            </h2>
+            <p class="text-xl mb-8 text-indigo-100">
+                Join thousands of professionals who write with confidence
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                <div class="flex items-center gap-2 text-indigo-100">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Free forever plan</span>
+                </div>
+                <div class="flex items-center gap-2 text-indigo-100">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>No credit card required</span>
+                </div>
+                <div class="flex items-center gap-2 text-indigo-100">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Setup in 30 seconds</span>
+                </div>
+            </div>
+            <button onclick="showSignupModal()" class="bg-white text-primary px-12 py-5 rounded-lg hover:bg-gray-100 transition font-bold text-xl shadow-2xl">
+                Start Writing Free
+            </button>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8 px-4">
-        <div class="max-w-6xl mx-auto text-center">
-            <div class="flex items-center justify-center gap-2 mb-4">
-                <span class="text-2xl">✨</span>
-                <span class="text-xl font-bold">ClarityText</span>
+    <footer class="bg-gray-900 text-gray-300 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-white font-bold text-xl mb-4">ClarityText</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Your messy thoughts → clear messages, instantly.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#how-it-works" class="hover:text-white transition">How It Works</a></li>
+                        <li><a href="#pricing" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition">Roadmap</a></li>
+                        <li><a href="#" class="hover:text-white transition">Changelog</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">About</a></li>
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-white transition">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white transition">Cookie Policy</a></li>
+                    </ul>
+                </div>
             </div>
-            <p class="text-gray-400 mb-4">Your thoughts, clearly said. Powered by Claude Sonnet 4.</p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-gray-400">
-                <a href="mailto:hello@claritytext.app" class="hover:text-white transition">hello@claritytext.app</a>
-                <span class="hidden sm:inline">•</span>
-                <span>© 2025 ClarityText. All rights reserved.</span>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">
+                    © 2025 ClarityText. All rights reserved.
+                </p>
+                <div class="flex gap-6 mt-4 md:mt-0">
+                    <a href="/cdn-cgi/l/email-protection#c6aea3aaaaa986a5aaa7b4afb2bfb2a3beb2e8a7b6b6" class="text-gray-400 hover:text-white transition">
+                        <span class="__cf_email__" data-cfemail="3a525f5656557a59565b48534e434e5f424e145b4a4a">[email&#160;protected]</span>
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
 
-    <!-- Signup/Login Modal (same as before, unchanged) -->
-    <div id="auth-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
-        <div class="modal-backdrop absolute inset-0" onclick="hideSignupModal()"></div>
-        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 relative z-10">
-            <button onclick="hideSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">
-                ×
-            </button>
-            
-            <h2 id="modal-title" class="text-2xl font-bold text-gray-900 mb-2">Sign Up for Free</h2>
-            <p class="text-gray-600 mb-6">Get 2 free transformations daily</p>
-            
-            <!-- Signup Form -->
-            <div id="signup-form">
-                <input 
-                    type="email" 
-                    id="signup-email"
-                    placeholder="your@email.com"
-                    class="w-full p-3 border-2 border-gray-300 rounded-lg mb-3 focus:border-primary focus:outline-none">
-                <input 
-                    type="password" 
-                    id="signup-password"
-                    placeholder="Password (min 6 characters)"
-                    class="w-full p-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-primary focus:outline-none">
-                <button 
-                    onclick="handleSignup()"
-                    class="w-full bg-primary text-white py-3 rounded-lg hover:bg-indigo-700 transition font-bold mb-3">
-                    Sign Up Free
+    <!-- Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 z-50">
+        <div class="modal-backdrop absolute inset-0" onclick="hideLoginModal()"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative z-10">
+                <button onclick="hideLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
                 </button>
-                <p class="text-center text-sm text-gray-600">
-                    Already have an account? 
-                    <button onclick="switchToLogin()" class="text-primary hover:underline font-semibold">
-                        Log in
+                
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+                <p class="text-gray-600 mb-6">Sign in to continue writing</p>
+                
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input 
+                            type="email" 
+                            id="login-email" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="you@example.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="••••••••">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                        Sign In
                     </button>
-                </p>
-            </div>
-            
-            <!-- Login Form (hidden by default) -->
-            <div id="login-form" class="hidden">
-                <input 
-                    type="email" 
-                    id="login-email"
-                    placeholder="your@email.com"
-                    class="w-full p-3 border-2 border-gray-300 rounded-lg mb-3 focus:border-primary focus:outline-none">
-                <input 
-                    type="password" 
-                    id="login-password"
-                    placeholder="Password"
-                    class="w-full p-3 border-2 border-gray-300 rounded-lg mb-4 focus:border-primary focus:outline-none">
-                <button 
-                    onclick="handleLogin()"
-                    class="w-full bg-primary text-white py-3 rounded-lg hover:bg-indigo-700 transition font-bold mb-3">
-                    Log In
-                </button>
-                <p class="text-center text-sm text-gray-600">
+                </form>
+                
+                <p class="text-center text-gray-600 mt-6">
                     Don't have an account? 
-                    <button onclick="switchToSignup()" class="text-primary hover:underline font-semibold">
-                        Sign up
-                    </button>
+                    <button onclick="switchToSignup()" class="text-primary hover:underline font-semibold">Sign up</button>
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script>
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="hidden fixed inset-0 z-50">
+        <div class="modal-backdrop absolute inset-0" onclick="hideSignupModal()"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl relative z-10">
+                <button onclick="hideSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                
+                <h2 class="text-3xl font-bold text-gray-900 mb-2">Start Writing Free</h2>
+                <p class="text-gray-600 mb-6">2 free rewrites daily. No credit card required.</p>
+                
+                <form onsubmit="handleSignup(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="signup-name" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="John Doe">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input 
+                            type="email" 
+                            id="signup-email" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="you@example.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input 
+                            type="password" 
+                            id="signup-password" 
+                            required 
+                            minlength="6"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-primary focus:outline-none"
+                            placeholder="••••••••">
+                        <p class="text-xs text-gray-500 mt-1">At least 6 characters</p>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-primary text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-semibold">
+                        Create Free Account
+                    </button>
+                </form>
+                
+                <p class="text-center text-gray-600 mt-6">
+                    Already have an account? 
+                    <button onclick="switchToLogin()" class="text-primary hover:underline font-semibold">Sign in</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // ============================================
-        // SUPABASE INITIALIZATION
+        // SUPABASE CONFIGURATION
         // ============================================
-        
         const SUPABASE_URL = 'https://ieeujkkggjufhmztvdyr.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZXVqa2tnZ2p1ZmhtenR2ZHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzIyMjc5NjYsImV4cCI6MjA0NzgwMzk2Nn0.JBsmz7RHtVQBIIOIOo-_Ls8fzMOXA-L6ZgwF69F0XtQ';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZXVqa2tnZ2p1ZmhtenR2ZHlyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NTEzNDgsImV4cCI6MjA3NzQyNzM0OH0.DwW8tiEzxHalnGETO9gfVpD257S_7-OJ6qRjoI25NH8';
         
+        // Initialize Supabase client
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
+        // API endpoint for rewriting
+        const API_ENDPOINT = '/api/rewrite';
+        
+        // Global variables
+        let selectedStyle = 'professional';
         let currentUser = null;
         let userTier = 'free';
+        let rewritesRemaining = 2; // For logged-out users
         
         // ============================================
-        // AUTH STATE MANAGEMENT
+        // AUTHENTICATION FUNCTIONS
         // ============================================
         
+        // Check if user is logged in on page load
         async function checkAuth() {
             const { data: { session } } = await supabase.auth.getSession();
             
             if (session) {
                 currentUser = session.user;
-                
-                // Load user data from database
                 await loadUserData();
-                
-                // Update UI for logged in state
-                document.getElementById('logged-out-nav').classList.add('hidden');
-                document.getElementById('logged-in-nav').classList.remove('hidden');
-                document.getElementById('nav-user-email').textContent = currentUser.email;
+                updateUIForLoggedInUser();
             } else {
-                // Not logged in
-                document.getElementById('logged-out-nav').classList.remove('hidden');
-                document.getElementById('logged-in-nav').classList.add('hidden');
+                updateUIForLoggedOutUser();
             }
         }
         
+        // Load user data from database
         async function loadUserData() {
-            if (!currentUser) return;
-            
             const { data, error } = await supabase
                 .from('users')
                 .select('*')
@@ -640,191 +1222,195 @@
             
             if (data) {
                 userTier = data.tier;
+                const limits = { 'free': 2, 'standard': 10, 'pro': 20 }; rewritesRemaining = limits[data.tier] ? (limits[data.tier] - data.rewrites_today) : 999;
             }
         }
         
-        async function handleNavLogout() {
+        // Handle login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) {
+                alert('Error: ' + error.message);
+                return;
+            }
+            
+            currentUser = data.user;
+            await loadUserData();
+            hideLoginModal();
+            updateUIForLoggedInUser();
+            alert('Welcome back!');
+        }
+        
+        // Handle signup
+        async function handleSignup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            
+            const { data, error } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: name
+                    }
+                }
+            });
+            
+            if (error) {
+                alert('Error: ' + error.message);
+                return;
+            }
+            
+            hideSignupModal();
+            alert('Success! Please check your email to confirm your account.');
+        }
+        
+        // Handle logout
+        async function handleLogout() {
             await supabase.auth.signOut();
-            window.location.reload();
+            currentUser = null;
+            userTier = 'free';
+            rewritesRemaining = 2;
+            updateUIForLoggedOutUser();
+            alert('Logged out successfully');
+        }
+        
+        // Update UI for logged-in user
+        function updateUIForLoggedInUser() {
+            document.getElementById('logged-out-nav').classList.add('hidden');
+            document.getElementById('logged-in-nav').classList.remove('hidden');
+            document.getElementById('user-email').textContent = currentUser.email;
+            
+            if (userTier === 'free') {
+                document.getElementById('demo-subtitle').textContent = `${rewritesRemaining} rewrites remaining today`;
+            } else {
+                document.getElementById('demo-subtitle').textContent = 'Unlimited rewrites';
+            }
+        }
+        
+        // Update UI for logged-out user
+        function updateUIForLoggedOutUser() {
+            document.getElementById('logged-out-nav').classList.remove('hidden');
+            document.getElementById('logged-in-nav').classList.add('hidden');
+            document.getElementById('demo-subtitle').textContent = '2 free transformations - no signup required';
         }
         
         // ============================================
-        // MODAL MANAGEMENT
+        // MODAL FUNCTIONS
         // ============================================
         
+        function showLoginModal() {
+            document.getElementById('login-modal').classList.remove('hidden');
+        }
+        
+        function hideLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+        
         function showSignupModal() {
-            document.getElementById('auth-modal').classList.remove('hidden');
+            document.getElementById('signup-modal').classList.remove('hidden');
         }
         
         function hideSignupModal() {
-            document.getElementById('auth-modal').classList.add('hidden');
-        }
-        
-        function switchToLogin() {
-            document.getElementById('signup-form').classList.add('hidden');
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('modal-title').textContent = 'Log In';
+            document.getElementById('signup-modal').classList.add('hidden');
         }
         
         function switchToSignup() {
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('signup-form').classList.remove('hidden');
-            document.getElementById('modal-title').textContent = 'Sign Up for Free';
+            hideLoginModal();
+            showSignupModal();
+        }
+        
+        function switchToLogin() {
+            hideSignupModal();
+            showLoginModal();
         }
         
         // ============================================
-        // AUTH HANDLERS
+        // DEMO FUNCTIONS
         // ============================================
         
-        async function handleSignup() {
-            const email = document.getElementById('signup-email').value.trim();
-            const password = document.getElementById('signup-password').value;
+        async function selectStyle(style) {
+            // Check if it's a paid style
+            const paidStyles = ['persuasive', 'casual', 'formal', 'empathetic'];
             
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-            
-            if (password.length < 6) {
-                alert('Password must be at least 6 characters');
-                return;
-            }
-            
-            try {
-                const { data, error } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                });
+            if (paidStyles.includes(style) && currentUser) {
+                // Check user's tier
+                const { data: userData } = await supabase
+                    .from('users')
+                    .select('tier')
+                    .eq('id', currentUser.id)
+                    .single();
                 
-                if (error) throw error;
-                
-                // Track signup in GA4
-                if (typeof gtag !== 'undefined') {
-                    gtag('event', 'sign_up', {
-                        method: 'email'
-                    });
+                if (userData && userData.tier === 'free') {
+                    // Free user trying to use paid style
+                    const upgradeConfirm = confirm(
+                        `The "${style}" style is only available on Standard ($9/month) and Pro ($15/month) plans.\n\nUpgrade now to access all 7 styles?`
+                    );
+                    
+                    if (upgradeConfirm) {
+                        // Scroll to pricing section
+                        document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' });
+                    }
+                    
+                    // Reset to professional
+                    style = 'professional';
                 }
-                
-                alert('Signup successful! Check your email to verify your account.');
-                hideSignupModal();
-                
-            } catch (error) {
-                alert('Signup error: ' + error.message);
-            }
-        }
-        
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
-            
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
             }
             
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password,
-                });
-                
-                if (error) throw error;
-                
-                alert('Login successful!');
-                hideSignupModal();
-                window.location.reload();
-                
-            } catch (error) {
-                alert('Login error: ' + error.message);
-            }
-        }
-        
-        // ============================================
-        // DEMO SECTION LOGIC
-        // ============================================
-        
-        let demoSelectedStyle = 'professional';
-        let rewritesRemaining = 2; // Anonymous users get 2 free
-        
-        function selectDemoStyle(style) {
-            demoSelectedStyle = style;
+            selectedStyle = style;
             
             // Update button styles
-            document.querySelectorAll('.demo-style-btn').forEach(btn => {
-                if (btn.dataset.style === style) {
-                    btn.classList.add('border-primary', 'bg-primary', 'text-white');
-                    btn.classList.remove('border-gray-300');
-                } else {
-                    btn.classList.remove('border-primary', 'bg-primary', 'text-white');
-                    btn.classList.add('border-gray-300');
-                }
+            document.querySelectorAll('.style-btn').forEach(btn => {
+                btn.classList.remove('bg-primary', 'text-white', 'border-primary');
+                btn.classList.add('border-gray-300');
             });
-        }
-        
-        // Check if user has used their free transformations (localStorage tracking for non-logged-in users)
-        function checkFreeUsage() {
-            const today = new Date().toDateString();
-            const stored = localStorage.getItem('claritytext_free_usage');
             
-            if (stored) {
-                const data = JSON.parse(stored);
-                if (data.date === today) {
-                    rewritesRemaining = Math.max(0, 2 - data.count);
-                } else {
-                    // New day, reset
-                    localStorage.setItem('claritytext_free_usage', JSON.stringify({ date: today, count: 0 }));
-                    rewritesRemaining = 2;
-                }
-            } else {
-                localStorage.setItem('claritytext_free_usage', JSON.stringify({ date: today, count: 0 }));
-                rewritesRemaining = 2;
-            }
-            
-            updateDemoSubtitle();
-        }
-        
-        function incrementFreeUsage() {
-            const today = new Date().toDateString();
-            const stored = localStorage.getItem('claritytext_free_usage');
-            
-            if (stored) {
-                const data = JSON.parse(stored);
-                if (data.date === today) {
-                    data.count++;
-                    localStorage.setItem('claritytext_free_usage', JSON.stringify(data));
-                }
+            const selectedBtn = document.querySelector(`[data-style="${style}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('bg-primary', 'text-white', 'border-primary');
+                selectedBtn.classList.remove('border-gray-300');
             }
         }
         
-        async function transformDemoMessage() {
-            const input = document.getElementById('demo-input').value.trim();
+        async function handleTransform() {
+            const demoInput = document.getElementById('demo-input');
+            const transformBtn = document.getElementById('transform-btn');
+            const demoOutput = document.getElementById('demo-output');
+            const outputContent = document.getElementById('output-content');
+            const copyBtn = document.getElementById('copy-btn');
             
-            if (!input) {
-                alert('Please enter some text to transform');
+            const inputText = demoInput.value.trim();
+            if (!inputText) {
+                alert('Please enter some text first!');
                 return;
             }
             
-            // Check if user is logged in
-            if (!currentUser) {
-                // Check free usage limit
-                if (rewritesRemaining <= 0) {
-                    alert('You\'ve used your 2 free transformations today! Sign up to get 2 free transformations daily.');
-                    showSignupModal();
-                    return;
-                }
-            } else if (userTier === 'free') {
-                // For logged-in free users, check their database limit
-                await loadUserData();
-                if (rewritesRemaining <= 0) {
-                    alert('Daily limit reached! Upgrade to Standard or Pro for more rewrites.');
-                    return;
-                }
+            // Check usage limits
+            if (!currentUser && rewritesRemaining <= 0) {
+                showSignupModal();
+                return;
             }
             
-            const transformBtn = document.getElementById('demo-transform-btn');
-            const demoOutput = document.getElementById('demo-output');
-            const outputContent = document.getElementById('output-content');
+            if (currentUser && userTier === 'free' && rewritesRemaining <= 0) {
+                if (confirm('You\'ve used all 2 free rewrites today. Upgrade to Standard for 10 rewrites/day?')) {
+                    handleUpgradeClick();
+                }
+                return;
+            }
             
+            // Show loading state
             transformBtn.innerHTML = '⏳ Transforming...';
             transformBtn.disabled = true;
             
@@ -836,27 +1422,32 @@
                     token = session?.access_token;
                 }
                 
-                const response = await fetch('/api/rewrite.js', {
+                // Call backend API
+                const response = await fetch(API_ENDPOINT, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         ...(token && { 'Authorization': `Bearer ${token}` })
                     },
                     body: JSON.stringify({
-                        text: input,
-                        style: demoSelectedStyle
+                        text: inputText,
+                        style: selectedStyle
                     })
                 });
                 
                 if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Transformation failed');
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'API request failed');
                 }
                 
                 const data = await response.json();
                 
-                // Format output (preserve line breaks and bullet points)
+                // Convert markdown to HTML
                 function formatOutput(text) {
+                    // Convert **bold** to <strong>
+                    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                    
+                    // Convert bullet points (- or * at start of line) to proper lists
                     const lines = text.split('\n');
                     let inList = false;
                     let formatted = [];
@@ -981,7 +1572,7 @@
         checkAuth();
         
         // Set default style button
-        document.querySelector('.demo-style-btn').click();
+        document.querySelector('.style-btn').click();
         
         // ============================================
         // PWA INSTALL PROMPT HANDLER - ENHANCED
