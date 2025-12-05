@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Cache bust: v2.0 -->
+<!-- Mobile-compatible version with touchend event listeners - v3.0 -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1632,6 +1632,40 @@
         
         // Set default style button
         document.querySelector('.style-btn').click();
+
+        // ============================================
+        // MOBILE-COMPATIBLE EVENT LISTENERS
+        // ============================================
+        
+        // Add event listeners for Transform button (mobile compatible)
+        const transformBtn = document.getElementById('transform-btn');
+        if (transformBtn) {
+            // Remove inline onclick
+            transformBtn.removeAttribute('onclick');
+            // Add proper event listeners
+            transformBtn.addEventListener('click', handleTransform);
+            transformBtn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                handleTransform();
+            });
+        }
+        
+        // Add event listeners for style buttons (mobile compatible)
+        document.querySelectorAll('.style-btn').forEach(btn => {
+            const style = btn.getAttribute('data-style');
+            // Remove inline onclick
+            btn.removeAttribute('onclick');
+            // Add proper event listeners
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                selectStyle(style);
+            });
+            btn.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                selectStyle(style);
+            });
+        });
+        
         
         // ============================================
         // PWA INSTALL PROMPT HANDLER - ENHANCED
@@ -1713,4 +1747,3 @@
     </script>
 </body>
 </html>
-
