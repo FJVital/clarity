@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Mobile-compatible version with touchend event listeners - v3.0 -->
+<!-- Mobile-compatible version with DOMContentLoaded wrapper - v4.0 MOBILE FIX -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1628,42 +1628,65 @@
         // INITIALIZE ON PAGE LOAD
         // ============================================
         
-        checkAuth();
-        
-        // Set default style button
-        document.querySelector('.style-btn').click();
-
-        // ============================================
-        // MOBILE-COMPATIBLE EVENT LISTENERS
-        // ============================================
-        
-        // Add event listeners for Transform button (mobile compatible)
-        const transformBtn = document.getElementById('transform-btn');
-        if (transformBtn) {
-            // Remove inline onclick
-            transformBtn.removeAttribute('onclick');
-            // Add proper event listeners
-            transformBtn.addEventListener('click', handleTransform);
-            transformBtn.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                handleTransform();
+        // Wait for DOM to be fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM fully loaded, initializing...');
+            
+            // Check authentication
+            checkAuth();
+            
+            // ============================================
+            // MOBILE-COMPATIBLE EVENT LISTENERS
+            // ============================================
+            
+            // Add event listeners for Transform button (mobile compatible)
+            const transformBtn = document.getElementById('transform-btn');
+            if (transformBtn) {
+                console.log('✅ Transform button found');
+                // Remove inline onclick
+                transformBtn.removeAttribute('onclick');
+                // Add proper event listeners
+                transformBtn.addEventListener('click', handleTransform);
+                transformBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👆 Touch detected on transform button');
+                    handleTransform();
+                });
+            } else {
+                console.error('❌ Transform button NOT found');
+            }
+            
+            // Add event listeners for style buttons (mobile compatible)
+            const styleButtons = document.querySelectorAll('.style-btn');
+            console.log('✅ Found ' + styleButtons.length + ' style buttons');
+            
+            styleButtons.forEach(btn => {
+                const style = btn.getAttribute('data-style');
+                // Remove inline onclick
+                btn.removeAttribute('onclick');
+                // Add proper event listeners
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    selectStyle(style);
+                });
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👆 Touch detected on style button: ' + style);
+                    selectStyle(style);
+                });
             });
-        }
-        
-        // Add event listeners for style buttons (mobile compatible)
-        document.querySelectorAll('.style-btn').forEach(btn => {
-            const style = btn.getAttribute('data-style');
-            // Remove inline onclick
-            btn.removeAttribute('onclick');
-            // Add proper event listeners
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                selectStyle(style);
-            });
-            btn.addEventListener('touchend', function(e) {
-                e.preventDefault();
-                selectStyle(style);
-            });
+            
+            // Set default style button AFTER event listeners are attached
+            setTimeout(function() {
+                const firstStyleBtn = document.querySelector('.style-btn');
+                if (firstStyleBtn) {
+                    selectStyle('professional');
+                }
+            }, 100);
+            
+            console.log('✅ All event listeners attached successfully');
         });
         
         
@@ -1747,4 +1770,3 @@
     </script>
 </body>
 </html>
-
