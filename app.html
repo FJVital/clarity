@@ -256,7 +256,7 @@
     <footer class="mt-12 pb-8 px-4">
         <div class="max-w-4xl mx-auto text-center text-sm text-gray-500">
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <a href="mailto:hello@claritytext.app" class="hover:text-primary transition">hello@claritytext.app</a>
+                <a href="/cdn-cgi/l/email-protection#dcb4b9b0b0b39cbfb0bdaeb5a8a5a8b9a4a8f2bdacac" class="hover:text-primary transition"><span class="__cf_email__" data-cfemail="2d45484141426d4e414c5f44595459485559034c5d5d">[email&#160;protected]</span></a>
                 <span class="hidden sm:inline">•</span>
                 <a href="/" class="hover:text-primary transition">Back to Home</a>
                 <span class="hidden sm:inline">•</span>
@@ -271,7 +271,7 @@
 
 
     <!-- JavaScript -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
         // ============================================
         // SUPABASE INITIALIZATION
         // ============================================
@@ -734,7 +734,124 @@
                 window.location.href = url;
                 
             } catch (error) {
-                console.error('Portal error:', error);
+                console.error('Manage subscription error:', error);
                 alert('Error accessing subscription management: ' + error.message);
             }
         }
+        
+        // ============================================
+        // INITIALIZE ON PAGE LOAD - MOBILE COMPATIBLE
+        // ============================================
+        
+        // Wait for DOM to be fully loaded before initializing
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ DOM fully loaded, initializing app.html...');
+            
+            // Initialize authentication and URL parameters
+            checkAuth();
+            checkURLParams();
+            
+            // ============================================
+            // ATTACH EVENT LISTENERS FOR MOBILE
+            // ============================================
+            
+            // Logout button
+            const logoutBtn = document.querySelector('button[onclick="handleLogout()"]');
+            if (logoutBtn) {
+                logoutBtn.removeAttribute('onclick');
+                logoutBtn.addEventListener('click', handleLogout);
+                logoutBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleLogout();
+                });
+            }
+            
+            // Upgrade Standard button
+            const upgradeStdBtn = document.querySelector('button[onclick="handleUpgradeStandard()"]');
+            if (upgradeStdBtn) {
+                upgradeStdBtn.removeAttribute('onclick');
+                upgradeStdBtn.addEventListener('click', handleUpgradeStandard);
+                upgradeStdBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleUpgradeStandard();
+                });
+            }
+            
+            // Upgrade Pro button
+            const upgradeProBtn = document.querySelector('button[onclick="handleUpgradePro()"]');
+            if (upgradeProBtn) {
+                upgradeProBtn.removeAttribute('onclick');
+                upgradeProBtn.addEventListener('click', handleUpgradePro);
+                upgradeProBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleUpgradePro();
+                });
+            }
+            
+            // Manage Subscription button
+            const manageSubBtn = document.querySelector('button[onclick="handleManageSubscription()"]');
+            if (manageSubBtn) {
+                manageSubBtn.removeAttribute('onclick');
+                manageSubBtn.addEventListener('click', handleManageSubscription);
+                manageSubBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleManageSubscription();
+                });
+            }
+            
+            // Style selection buttons
+            const styleButtons = document.querySelectorAll('.style-btn');
+            console.log('✅ Found ' + styleButtons.length + ' style buttons');
+            
+            styleButtons.forEach(btn => {
+                const style = btn.getAttribute('data-style');
+                btn.removeAttribute('onclick');
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    selectStyle(style);
+                });
+                btn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👆 Touch detected on style button: ' + style);
+                    selectStyle(style);
+                });
+            });
+            
+            // Transform button
+            const transformBtn = document.getElementById('transform-btn');
+            if (transformBtn) {
+                console.log('✅ Transform button found');
+                transformBtn.removeAttribute('onclick');
+                transformBtn.addEventListener('click', transformMessage);
+                transformBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('👆 Touch detected on transform button');
+                    transformMessage();
+                });
+            } else {
+                console.error('❌ Transform button NOT found');
+            }
+            
+            // Copy button
+            const copyBtn = document.getElementById('copy-btn');
+            if (copyBtn) {
+                copyBtn.removeAttribute('onclick');
+                copyBtn.addEventListener('click', copyToClipboard);
+                copyBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    copyToClipboard();
+                });
+            }
+            
+            console.log('✅ All event listeners attached successfully');
+        });
+    </script>
+</body>
+</html>
