@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClarityText - Mobile Debug Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #debug-console {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: black;
+            color: lime;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 pt-52">
+    
+    <!-- VISIBLE DEBUG CONSOLE -->
+    <div id="debug-console">
+        <div>🔍 Debug Console - Tap buttons below</div>
+    </div>
+    
+    <!-- Test Content -->
+    <div class="max-w-2xl mx-auto px-4">
+        <h1 class="text-2xl font-bold text-center mb-8">Mobile Debug Test</h1>
+        
+        <!-- Test Button 1: Simple Alert -->
+        <button 
+            id="test-btn-1"
+            class="w-full bg-blue-500 text-white py-4 rounded-lg mb-4 font-bold">
+            TEST 1: Tap for Alert
+        </button>
+        
+        <!-- Test Button 2: Style Button Mimic -->
+        <button 
+            id="test-btn-2"
+            class="w-full bg-green-500 text-white py-4 rounded-lg mb-4 font-bold">
+            TEST 2: Style Button Test
+        </button>
+        
+        <!-- Test Button 3: Transform Button Mimic -->
+        <button 
+            id="test-btn-3"
+            class="w-full bg-purple-500 text-white py-4 rounded-lg mb-4 font-bold">
+            TEST 3: Transform Test
+        </button>
+        
+        <!-- Tap Counter -->
+        <div class="bg-white p-4 rounded-lg text-center">
+            <div class="text-4xl font-bold" id="tap-counter">0</div>
+            <div class="text-sm text-gray-600">Total Taps Detected</div>
+        </div>
+    </div>
+    
+    <script>
+        // Visible debug logging
+        let tapCount = 0;
+        const debugConsole = document.getElementById('debug-console');
+        const tapCounter = document.getElementById('tap-counter');
+        
+        function log(message) {
+            console.log(message);
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ' - ' + message;
+            debugConsole.appendChild(div);
+            debugConsole.scrollTop = debugConsole.scrollHeight;
+        }
+        
+        function incrementTap() {
+            tapCount++;
+            tapCounter.textContent = tapCount;
+            log('👆 TAP #' + tapCount + ' DETECTED');
+        }
+        
+        // Test if script is running AT ALL
+        log('✅ JavaScript IS RUNNING');
+        
+        // UNREGISTER SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                    log('🗑️ Unregistered service worker');
+                }
+            });
+        }
+        
+        // Wait for DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            log('✅ DOMContentLoaded fired');
+            
+            // Test Button 1
+            const btn1 = document.getElementById('test-btn-1');
+            if (btn1) {
+                log('✅ Button 1 found');
+                
+                // Click event
+                btn1.addEventListener('click', function() {
+                    incrementTap();
+                    alert('Click event worked!');
+                    log('✅ CLICK EVENT WORKED');
+                });
+                
+                // Touch event
+                btn1.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    incrementTap();
+                    alert('Touch event worked!');
+                    log('✅ TOUCHEND EVENT WORKED');
+                });
+            } else {
+                log('❌ Button 1 NOT FOUND');
+            }
+            
+            // Test Button 2
+            const btn2 = document.getElementById('test-btn-2');
+            if (btn2) {
+                log('✅ Button 2 found');
+                btn2.addEventListener('click', function() {
+                    incrementTap();
+                    log('✅ Button 2 clicked');
+                });
+                btn2.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    incrementTap();
+                    log('✅ Button 2 touched');
+                });
+            }
+            
+            // Test Button 3
+            const btn3 = document.getElementById('test-btn-3');
+            if (btn3) {
+                log('✅ Button 3 found');
+                btn3.addEventListener('click', function() {
+                    incrementTap();
+                    log('✅ Button 3 clicked');
+                });
+                btn3.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    incrementTap();
+                    log('✅ Button 3 touched');
+                });
+            }
+            
+            log('✅ All event listeners attached');
+        });
+        
+        log('📱 Script finished loading');
+    </script>
+</body>
+</html>
