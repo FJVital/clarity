@@ -233,6 +233,13 @@
                 Transform Message ✨
             </button>
             
+            <!-- Signup CTA (shown for logged-out users) -->
+            <div id="signup-cta" class="mt-3 text-center">
+                <p class="text-lg font-bold text-orange-600">
+                    <a href="/" class="hover:text-green-700 transition">Sign up to upgrade to PRO version</a>
+                </p>
+            </div>
+            
             <!-- Output (hidden by default) -->
             <div id="output" class="mt-6 hidden">
                 <div class="flex justify-between items-center mb-2">
@@ -345,6 +352,10 @@
                 document.getElementById('logged-out-header').classList.add('hidden');
                 document.getElementById('logged-in-header').classList.remove('hidden');
                 document.getElementById('user-email').textContent = currentUser.email;
+                
+                // Hide signup CTA for logged-in users
+                const signupCTA = document.getElementById('signup-cta');
+                if (signupCTA) signupCTA.classList.add('hidden');
                 
                 // Show tier badge
                 updateTierBadge();
@@ -748,6 +759,7 @@
             console.log('✅ DOM fully loaded, initializing app.html...');
             
             // Initialize authentication and URL parameters
+
             checkAuth();
             checkURLParams();
             
@@ -827,7 +839,9 @@
             if (transformBtn) {
                 console.log('✅ Transform button found');
                 transformBtn.removeAttribute('onclick');
-                transformBtn.addEventListener('click', transformMessage);
+                transformBtn.addEventListener('click', function() {
+                    transformMessage();
+                });
                 transformBtn.addEventListener('touchend', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
