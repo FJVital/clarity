@@ -1017,7 +1017,7 @@
                         What do you do with my data?
                     </h3>
                     <p class="text-gray-600">
-                        <strong>Privacy is critical.</strong> Your transformations are processed by Claude Sonnet 4.5 API and not stored permanently. We don't store your inputs or outputs in our database. We store: your email (for account access), payment info (Stripe handles this securely), and usage count (to track monthly limits). Anthropic doesn't train on API data. We never sell your data—that's not our business model. For sensitive information: remove identifying details before transforming. Questions? Email: <a href="mailto:hello@claritytext.app" class="text-primary hover:underline font-semibold">hello@claritytext.app</a>
+                        <strong>Privacy is critical.</strong> Your transformations are processed by Claude Sonnet 4.5 API and not stored permanently. We don't store your inputs or outputs in our database. We store: your email (for account access), payment info (Stripe handles this securely), and usage count (to track monthly limits). Anthropic doesn't train on API data. We never sell your data—that's not our business model. For sensitive information: remove identifying details before transforming. Questions? Email: <a href="/cdn-cgi/l/email-protection#ef878a838380af8c838e9d869b969b8a979bc18e9f9f" class="text-primary hover:underline font-semibold"><span class="__cf_email__" data-cfemail="355d5059595a75565954475c414c41504d411b544545">[email&#160;protected]</span></a>
                     </p>
                 </div>
                 
@@ -1669,6 +1669,26 @@
         // ============================================
         
         // Wait for DOM to be fully loaded before initializing
+
+        // ============================================
+        // MAKE FUNCTIONS GLOBALLY ACCESSIBLE FOR ONCLICK HANDLERS
+        // ============================================
+        // These functions need to be on window object for inline onclick to work
+        window.showLoginModal = showLoginModal;
+        window.hideLoginModal = hideLoginModal;
+        window.showSignupModal = showSignupModal;
+        window.hideSignupModal = hideSignupModal;
+        window.switchToSignup = switchToSignup;
+        window.switchToLogin = switchToLogin;
+        window.selectStyle = selectStyle;
+        window.handleTransform = handleTransform;
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+        window.handleLogout = handleLogout;
+        window.handleUpgradeClick = handleUpgradeClick;
+        window.scrollToDemo = scrollToDemo;
+        window.handleHeroInstall = handleHeroInstall;
+        
         document.addEventListener('DOMContentLoaded', function() {
             console.log('✅ DOM fully loaded, initializing...');
             
@@ -1684,7 +1704,7 @@
             if (transformBtn) {
                 console.log('✅ Transform button found');
                 // Remove inline onclick
-                transformBtn.removeAttribute('onclick');
+                // transformBtn.removeAttribute('onclick');
                 // Add proper event listeners
                 transformBtn.addEventListener('click', handleTransform);
                 transformBtn.addEventListener('touchend', function(e) {
@@ -1704,7 +1724,7 @@
             styleButtons.forEach(btn => {
                 const style = btn.getAttribute('data-style');
                 // Remove inline onclick
-                btn.removeAttribute('onclick');
+                // btn.removeAttribute('onclick');
                 // Add proper event listeners
                 btn.addEventListener('click', function(e) {
                     e.preventDefault();
@@ -1840,13 +1860,3 @@
                                     window.location.reload();
                                 }
                             });
-                        });
-                    })
-                    .catch((err) => {
-                        console.error('❌ ServiceWorker registration failed:', err);
-                    });
-            });
-        }
-    </script>
-</body>
-</html>
